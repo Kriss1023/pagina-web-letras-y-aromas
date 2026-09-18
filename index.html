@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Letras & Aromas</title>
+
+    <link rel="stylesheet" href="estilos.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <div class="logo-container">
+            <img src="imagenes/logo.png" alt="Letras & Aromas">
+            <div>
+                <h2>Letras & Aromas</h2>
+                <span>Historias que iluminan</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="#inicio">Inicio</a>
+            <a href="#libros">Libros</a>
+            <a href="#velas">Velas</a>
+            <a href="#nosotros">Nosotros</a>
+        </nav>
+
+        <div class="acciones">
+
+            <button onclick="abrirLogin()" class="icono">
+                👤
+            </button>
+
+            <button onclick="mostrarCarrito()" class="icono carrito-btn">
+                🛒
+                <span id="contador">0</span>
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- INICIO -->
+    <section id="inicio" class="inicio">
+
+        <div class="inicio-texto">
+
+            <span class="etiqueta">✨ Bienvenidos</span>
+
+            <h1>
+                Un buen libro,
+                <br>
+                una vela,
+                <br>
+                <span>un momento especial.</span>
+            </h1>
+
+            <p>
+                Descubre libros que despiertan emociones
+                y velas que crean ambientes llenos de magia.
+            </p>
+
+            <div class="botones">
+
+                <a href="#libros" class="boton">
+                    📚 Ver libros
+                </a>
+
+                <a href="#velas" class="boton boton-secundario">
+                    🕯️ Ver velas
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="inicio-logo">
+
+            <div class="circulo">
+
+                <img src="imagenes/logo.png" alt="Letras & Aromas">
+
+            </div>
+
+            <div class="decoracion estrella1">✦</div>
+            <div class="decoracion estrella2">✧</div>
+            <div class="decoracion flor">🌸</div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BENEFICIOS -->
+    <section class="beneficios">
+
+        <div class="beneficio">
+            <span>📦</span>
+            <h3>Envíos</h3>
+            <p>Recibe tus productos en la comodidad de tu hogar.</p>
+        </div>
+
+        <div class="beneficio">
+            <span>💝</span>
+            <h3>Regalos</h3>
+            <p>Detalles especiales para personas especiales.</p>
+        </div>
+
+        <div class="beneficio">
+            <span>🌿</span>
+            <h3>Calidad</h3>
+            <p>Productos seleccionados con mucho cariño.</p>
+        </div>
+
+        <div class="beneficio">
+            <span>💗</span>
+            <h3>Hecho con amor</h3>
+            <p>Cada detalle está pensado para ti.</p>
+        </div>
+
+    </section>
+    <!-- LIBROS -->
+    <section id="libros" class="productos-seccion">
+
+        <div class="titulo">
+
+            <span>📚 Nuestra colección</span>
+
+            <h2>Libros</h2>
+
+            <p>
+                Historias para perderte, soñar y descubrir nuevos mundos.
+            </p>
+
+        </div>
+
+
+        <div class="productos">
+
+            <!-- LIBRO 1 -->
+            <article class="producto">
+
+                <div class="producto-imagen libro1">
+                    📖
+                </div>
+
+                <div class="producto-info">
+
+                    <span class="categoria">NOVELA</span>
+
+                    <h3>Entre páginas</h3>
+
+                    <p>
+                        Una historia llena de emociones,
+                        encuentros y nuevos comienzos.
+                    </p>
+
+                    <div class="producto-abajo">
+
+                        <strong>$18.00</strong>
+
+                        <button onclick="agregarCarrito('Entre páginas', 18)">
+                            Agregar 🛒
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- LIBRO 2 -->
+            <article class="producto">
+
+                <div class="producto-imagen libro2">
+                    📕
+                </div>
+
+                <div class="producto-info">
+
+                    <span class="categoria">ROMANCE</span>
+
+                    <h3>Cartas de otoño</h3>
+
+                    <p>
+                        Una historia romántica para leer
+                        acompañada de una taza de café.
+                    </p>
+
+                    <div class="producto-abajo">
+
+                        <strong>$20.00</strong>
+
+                        <button onclick="agregarCarrito('Cartas de otoño', 20)">
+                            Agregar 🛒
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- LIBRO 3 -->
+            <article class="producto">
+
+                <div class="producto-imagen libro3">
+                    📘
+                </div>
+
+                <div class="producto-info">
+
+                    <span class="categoria">FANTASÍA</span>
+
+                    <h3>El jardín secreto</h3>
+
+                    <p>
+                        Una aventura mágica donde
+                        todo puede hacerse realidad.
+                    </p>
+
+                    <div class="producto-abajo">
+
+                        <strong>$22.00</strong>
+
+                        <button onclick="agregarCarrito('El jardín secreto', 22)">
+                            Agregar 🛒
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- VELAS -->
+    <section id="velas" class="productos-seccion velas">
+
+        <div class="titulo">
+
+            <span>🕯️ Aromas especiales</span>
+
+            <h2>Velas</h2>
+
+            <p>
+                Aromas suaves para acompañar tus momentos favoritos.
+            </p>
+
+        </div>
+
+
+        <div class="productos">
+
+            <!-- VELA 1 -->
+            <article class="producto">
+
+                <div class="producto-imagen vela-lavanda">
+                    🕯️
+                </div>
+
+                <div class="producto-info">
+
+                    <span class="categoria">RELAX</span>
+
+                    <h3>Lavanda</h3>
+
+                    <p>
+                        Aroma floral y relajante para
+                        crear un espacio tranquilo.
+                    </p>
+
+                    <div class="producto-abajo">
+
+                        <strong>$12.00</strong>
+
+                        <button onclick="agregarCarrito('Vela de Lavanda', 12)">
+                            Agregar 🛒
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- VELA 2 -->
+            <article class="producto">
+
+                <div class="producto-imagen vela-vainilla">
+                    🕯️
+                </div>
+
+                <div class="producto-info">
+
+                    <span class="categoria">DULCE</span>
+
+                    <h3>Vainilla</h3>
+
+                    <p>
+                        Un aroma cálido, dulce y acogedor.
+                    </p>
+
+                    <div class="producto-abajo">
+
+                        <strong>$13.00</strong>
+
+                        <button onclick="agregarCarrito('Vela de Vainilla', 13)">
+                            Agregar 🛒
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- VELA 3 -->
+            <article class="producto">
+
+                <div class="producto-imagen vela-rosas">
+                    🕯️
+                </div>
+
+                <div class="producto-info">
+
+                    <span class="categoria">FLORAL</span>
+
+                    <h3>Pétalos de rosa</h3>
+
+                    <p>
+                        Una fragancia romántica y delicada.
+                    </p>
+
+                    <div class="producto-abajo">
+
+                        <strong>$15.00</strong>
+
+                        <button onclick="agregarCarrito('Vela de Rosas', 15)">
+                            Agregar 🛒
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- VELA 4 -->
+            <article class="producto">
+
+                <div class="producto-imagen vela-canela">
+                    🕯️
+                </div>
+
+                <div class="producto-info">
+
+                    <span class="categoria">CÁLIDO</span>
+
+                    <h3>Canela</h3>
+
+                    <p>
+                        Perfecta para crear un ambiente
+                        cálido y acogedor.
+                    </p>
+
+                    <div class="producto-abajo">
+
+                        <strong>$14.00</strong>
+
+                        <button onclick="agregarCarrito('Vela de Canela', 14)">
+                            Agregar 🛒
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+    <!-- NOSOTROS -->
+    <section id="nosotros" class="nosotros">
+
+        <div class="nosotros-imagen">
+            📚
+            <span>+</span>
+            🕯️
+        </div>
+
+        <div class="nosotros-texto">
+
+            <span>💗 Nuestra historia</span>
+
+            <h2>
+                Letras que cuentan historias,
+                aromas que crean recuerdos.
+            </h2>
+
+            <p>
+                En Letras & Aromas creemos que los pequeños
+                momentos pueden convertirse en recuerdos
+                inolvidables.
+            </p>
+
+            <p>
+                Por eso reunimos libros y velas para que puedas
+                crear tu propio espacio de tranquilidad,
+                imaginación y bienestar.
+            </p>
+
+            <button class="boton" onclick="mostrarMensaje('¡Gracias por visitarnos! 💕')">
+                Conocer más
+            </button>
+
+        </div>
+
+    </section>
+    <!-- NEWSLETTER -->
+    <section class="newsletter">
+
+        <h2>Únete a nuestra comunidad 💌</h2>
+
+        <p>
+            Recibe novedades, recomendaciones y promociones.
+        </p>
+
+        <form onsubmit="suscribirse(event)">
+
+            <input
+                type="email"
+                id="correoNewsletter"
+                placeholder="Tu correo electrónico"
+                required
+            >
+
+            <button type="submit">
+                Suscribirme
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <div>
+
+            <h2>Letras & Aromas</h2>
+
+            <p>
+                Historias que iluminan ✨
+            </p>
+
+        </div>
+
+        <div>
+
+            <h3>Contacto</h3>
+
+            <p>📧 contacto@letrasyaromas.com</p>
+            <p>📱 +593 999 999 999</p>
+
+        </div>
+
+        <div>
+
+            <h3>Síguenos</h3>
+
+            <p>Instagram · Facebook · TikTok</p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- MODAL LOGIN -->
+    <div id="modalLogin" class="ventana">
+
+        <div class="ventana-contenido">
+
+            <button class="cerrar" onclick="cerrarLogin()">×</button>
+
+            <h2>👤 Iniciar sesión</h2>
+
+            <p>Bienvenido nuevamente 💗</p>
+
+            <form onsubmit="iniciarSesion(event)">
+
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="Correo electrónico"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Contraseña"
+                    required
+                >
+
+                <button class="boton-cuenta" type="submit">
+                    Iniciar sesión
+                </button>
+
+            </form>
+
+            <p class="cambiar-formulario">
+                ¿No tienes una cuenta?
+                <button onclick="abrirRegistro()">
+                    Regístrate
+                </button>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- MODAL REGISTRO -->
+    <div id="modalRegistro" class="ventana">
+
+        <div class="ventana-contenido">
+
+            <button class="cerrar" onclick="cerrarRegistro()">×</button>
+
+            <h2>🌸 Crear cuenta</h2>
+
+            <p>Únete a Letras & Aromas</p>
+
+            <form onsubmit="registrarse(event)">
+
+                <input
+                    type="text"
+                    id="registroNombre"
+                    placeholder="Tu nombre"
+                    required
+                >
+
+                <input
+                    type="email"
+                    id="registroEmail"
+                    placeholder="Correo electrónico"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="registroPassword"
+                    placeholder="Contraseña"
+                    required
+                >
+
+                <button class="boton-cuenta" type="submit">
+                    Crear cuenta
+                </button>
+
+            </form>
+
+            <p class="cambiar-formulario">
+                ¿Ya tienes una cuenta?
+                <button onclick="abrirLogin()">
+                    Iniciar sesión
+                </button>
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- CARRITO -->
+    <div id="modalCarrito" class="ventana">
+
+        <div class="ventana-contenido carrito">
+
+            <button class="cerrar" onclick="cerrarCarrito()">×</button>
+
+            <h2>🛒 Mi carrito</h2>
+
+            <div id="listaCarrito">
+                <p>Tu carrito está vacío 💗</p>
+            </div>
+
+            <div class="total">
+
+                <span>Total:</span>
+
+                <strong id="totalCarrito">
+                    $0.00
+                </strong>
+
+            </div>
+
+            <button class="boton-cuenta" onclick="comprar()">
+                Comprar ✨
+            </button>
+
+        </div>
+
+    </div>
+    <!-- MENSAJE -->
+    <div id="mensaje" class="mensaje">
+        ¡Producto agregado! 💗
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
