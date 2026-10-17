@@ -550,7 +550,7 @@ nav a:hover {
 
 .vela-lavanda {
     background: linear-gradient(
-        135deg,
+        125deg,
         #ddd3eb,
         #c7b3dd
     );
@@ -558,7 +558,7 @@ nav a:hover {
 
 .vela-vainilla {
     background: linear-gradient(
-        135deg,
+        125deg,
         #f8e6bd,
         #eed39d
     );
@@ -566,15 +566,15 @@ nav a:hover {
 
 .vela-rosas {
     background: linear-gradient(
-        135deg,
+        125deg,
         #f4d3df,
         #e8afc1
     );
 }
 
-.vela-canela {
+.vela-chocolate {
     background: linear-gradient(
-        135deg,
+        125deg,
         #f1d2bd,
         #dfb194
     );
