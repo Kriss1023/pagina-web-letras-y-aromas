@@ -32,7 +32,7 @@ function actualizarCarrito() {
     if (carrito.length === 0) {
 
         lista.innerHTML = `
-            <p>Tu carrito está vacío 💗</p>
+            <p>Tu carrito está vacío </p>
         `;
 
         total.textContent = "$0.00";
@@ -121,14 +121,14 @@ function comprar() {
 
     if (carrito.length === 0) {
 
-        mostrarMensaje("Tu carrito está vacío 💗");
+        mostrarMensaje("Tu carrito está vacío ");
 
         return;
     }
 
 
     mostrarMensaje(
-        "✨ Gracias por tu compra. ¡Te contactaremos pronto!"
+        " Gracias por tu compra. ¡Te contactaremos pronto!"
     );
 
     carrito = [];
@@ -219,7 +219,7 @@ function registrarse(event) {
 
 
     mostrarMensaje(
-        "🌸 ¡Cuenta creada correctamente!"
+        " ¡Cuenta creada correctamente!"
     );
 
 
@@ -273,13 +273,13 @@ function iniciarSesion(event) {
 
 
         mostrarMensaje(
-            "💗 ¡Bienvenido/a, " + usuario.nombre + "!"
+            " ¡Bienvenido/a, " + usuario.nombre + "!"
         );
 
     } else {
 
         mostrarMensaje(
-            "❌ Correo o contraseña incorrectos"
+            " Correo o contraseña incorrectos"
         );
 
     }
@@ -301,7 +301,7 @@ function suscribirse(event) {
     if (correo) {
 
         mostrarMensaje(
-            "💌 ¡Gracias por suscribirte!"
+            " ¡Gracias por suscribirte!"
         );
 
 
