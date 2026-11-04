@@ -380,3 +380,25 @@ window.addEventListener("click", function(event) {
 ================================= */
 
 actualizarCarrito();
+const express = require("express");
+const path = require("path");
+
+const app = express();
+const PORT = 3000;
+
+// Sirve todo lo que esté dentro de /public (html, css, js, imágenes)
+app.use(express.static(path.join(__dirname, "public")));
+
+// Ejemplo de ruta propia (opcional)
+app.get("/api/saludo", (req, res) => {
+    res.json({ mensaje: "Bienvenidos a letras y aromas" });
+});
+
+// Si no existe la ruta, responde 404
+app.use((req, res) => {
+    res.status(404).send("Página no encontrada");
+});
+
+app.listen(PORT, () => {
+    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+});
