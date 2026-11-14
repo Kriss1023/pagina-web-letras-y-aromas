@@ -4,9 +4,273 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Letras y Aromas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f1ec;
+        }
+        header {
+            background: #4a2f1b;
+            color: white;
+            padding: 15px;
+        }
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        .caja {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .guardar { background: #4a2f1b; color: white; }
+        .editar { background: #ddd; }
+        .borrar { background: #b3261e; color: white; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        #mensaje { margin-bottom: 10px; }
+        .ok { color: green; }
+        .error { color: red; }
+    </style>
 </head>
 <body>
-    <h1>Panel de administración</h1>
-    <p>Bienvenido. Aquí podrás gestionar tu tienda.</p>
+    <header>
+        <h1>Panel de administración - Letras y Aromas</h1>
+    </header>
+
+    <main>
+        <div class="caja">
+            <h2 id="titulo-form">Agregar producto</h2>
+            <div id="mensaje"></div>
+
+            <form id="form-producto">
+                <input type="hidden" id="id">
+
+                <label>Nombre
+                    <input type="text" id="nombre" required>
+                </label>
+
+                <label>Categoría
+                    <input type="text" id="categoria" placeholder="Libros, Café, Velas...">
+                </label>
+
+                <label>Precio
+                    <input type="number" id="precio" min="0" step="0.01" required>
+                </label>
+
+                <label>Stock
+                    <input type="number" id="stock" min="0" value="0" required>
+                </label>
+
+                <label>Imagen (ruta dentro de public)
+                    <input type="text" id="imagen" placeholder="imagenes/cafe.jpg">
+                </label>
+
+                <label>Descripción
+                    <textarea id="descripcion" rows="3"></textarea>
+                </label>
+
+                <button type="submit" class="guardar">Guardar</button>
+                <button type="button" class="editar" id="btn-cancelar" style="display:none;">Cancelar edición</button>
+            </form>
+        </div>
+
+        <div class="caja">
+            <h2>Productos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // Dirección del servidor de Node (puerto 3000)
+        var API = "http://localhost:3000/admin/api/productos";
+
+        var form = document.getElementById("form-producto");
+        var tabla = document.getElementById("tabla");
+        var mensaje = document.getElementById("mensaje");
+        var btnCancelar = document.getElementById("btn-cancelar");
+
+        // Aquí guardo la lista de productos que llega del servidor
+        var productos = [];
+
+        // Muestra un mensaje arriba del formulario
+        function mostrarMensaje(texto, tipo) {
+            mensaje.textContent = texto;
+            mensaje.className = tipo;
+        }
+
+        // Pide los productos al servidor
+        async function cargarProductos() {
+            try {
+                var respuesta = await fetch(API);
+                productos = await respuesta.json();
+                mostrarTabla();
+            } catch (error) {
+                mostrarMensaje("No se pudo conectar con el servidor. ¿Está encendido (npm start)?", "error");
+            }
+        }
+
+        // Dibuja la tabla con los productos
+        function mostrarTabla() {
+            var html = "";
+
+            for (var i = 0; i < productos.length; i++) {
+                var p = productos[i];
+                var id = p._id || p.id; // MongoDB usa _id
+
+                html += "<tr>";
+                html += "<td>" + p.nombre + "</td>";
+                html += "<td>" + (p.categoria || "") + "</td>";
+                html += "<td>$" + p.precio + "</td>";
+                html += "<td>" + p.stock + "</td>";
+                html += "<td>";
+                html += "<button class='editar' onclick='editarProducto(" + i + ")'>Editar</button> ";
+                html += "<button class='borrar' onclick='borrarProducto(" + i + ")'>Borrar</button>";
+                html += "</td>";
+                html += "</tr>";
+            }
+
+            tabla.innerHTML = html;
+        }
+
+        // Pasa los datos del producto al formulario para editarlo
+        function editarProducto(i) {
+            var p = productos[i];
+
+            document.getElementById("id").value = p._id || p.id;
+            document.getElementById("nombre").value = p.nombre;
+            document.getElementById("categoria").value = p.categoria || "";
+            document.getElementById("precio").value = p.precio;
+            document.getElementById("stock").value = p.stock;
+            document.getElementById("imagen").value = p.imagen || "";
+            document.getElementById("descripcion").value = p.descripcion || "";
+
+            document.getElementById("titulo-form").textContent = "Editar producto";
+            btnCancelar.style.display = "inline-block";
+            window.scrollTo(0, 0);
+        }
+
+        // Deja el formulario vacío otra vez
+        function limpiarFormulario() {
+            form.reset();
+            document.getElementById("id").value = "";
+            document.getElementById("titulo-form").textContent = "Agregar producto";
+            btnCancelar.style.display = "none";
+        }
+
+        // Borra un producto
+        async function borrarProducto(i) {
+            var p = productos[i];
+            var id = p._id || p.id;
+
+            if (!confirm("¿Seguro que quieres borrar " + p.nombre + "?")) {
+                return;
+            }
+
+            try {
+                var respuesta = await fetch(API + "/" + id, { method: "DELETE" });
+
+                if (respuesta.ok) {
+                    mostrarMensaje("Producto borrado", "ok");
+                    cargarProductos();
+                } else {
+                    mostrarMensaje("No se pudo borrar", "error");
+                }
+            } catch (error) {
+                mostrarMensaje("No se pudo conectar con el servidor", "error");
+            }
+        }
+
+        // Cuando se envía el formulario (guardar o editar)
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            var id = document.getElementById("id").value;
+
+            // Datos que se envían al servidor
+            var datos = {
+                nombre: document.getElementById("nombre").value,
+                categoria: document.getElementById("categoria").value,
+                precio: Number(document.getElementById("precio").value),
+                stock: Number(document.getElementById("stock").value),
+                imagen: document.getElementById("imagen").value,
+                descripcion: document.getElementById("descripcion").value
+            };
+
+            // Si hay id es una edición (PUT), si no es un producto nuevo (POST)
+            var url = API;
+            var metodo = "POST";
+            if (id) {
+                url = API + "/" + id;
+                metodo = "PUT";
+            }
+
+            try {
+                var respuesta = await fetch(url, {
+                    method: metodo,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(datos)
+                });
+
+                var resultado = await respuesta.json();
+
+                if (respuesta.ok) {
+                    if (id) {
+                        mostrarMensaje("Producto actualizado", "ok");
+                    } else {
+                        mostrarMensaje("Producto agregado", "ok");
+                    }
+                    limpiarFormulario();
+                    cargarProductos();
+                } else {
+                    mostrarMensaje(resultado.error || "Error al guardar", "error");
+                }
+            } catch (error) {
+                mostrarMensaje("No se pudo conectar con el servidor", "error");
+            }
+        });
+
+        btnCancelar.addEventListener("click", limpiarFormulario);
+
+        // Al abrir la página se cargan los productos
+        cargarProductos();
+    </script>
 </body>
 </html>

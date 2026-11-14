@@ -40,9 +40,7 @@ function actualizarCarrito() {
         return;
     }
 
-
     lista.innerHTML = "";
-
 
     let suma = 0;
 
@@ -136,6 +134,72 @@ function comprar() {
     actualizarCarrito();
 
     cerrarCarrito();
+}
+
+
+/* =================================
+   PRODUCTOS DEL ADMIN
+   (los que se agregan desde el panel)
+================================= */
+
+// Aquí guardo los productos que llegan del servidor
+var productosServidor = [];
+
+// Pide los productos al servidor y los dibuja en la página
+async function cargarProductos() {
+
+    var contenedor = document.getElementById("productosNuevos");
+
+    try {
+        var respuesta = await fetch("/api/productos");
+        productosServidor = await respuesta.json();
+    } catch (error) {
+        contenedor.innerHTML = "<p>No se pudieron cargar los productos.</p>";
+        return;
+    }
+
+    // Si no hay productos mostramos un aviso
+    if (productosServidor.length === 0) {
+        contenedor.innerHTML = "<p>Pronto habrá productos nuevos.</p>";
+        return;
+    }
+
+    var html = "";
+
+    for (var i = 0; i < productosServidor.length; i++) {
+
+        var p = productosServidor[i];
+
+        html += '<article class="producto">';
+
+        html += '<div class="producto-imagen">';
+        // Solo pongo la imagen si el admin escribió una ruta
+        if (p.imagen) {
+            html += '<img src="' + p.imagen + '" alt="' + p.nombre + '">';
+        }
+        html += '</div>';
+
+        html += '<div class="producto-info">';
+        html += '<span class="categoria">' + p.categoria.toUpperCase() + '</span>';
+        html += '<h3>' + p.nombre + '</h3>';
+        html += '<p>' + p.descripcion + '</p>';
+
+        html += '<div class="producto-abajo">';
+        html += '<strong>$' + Number(p.precio).toFixed(2) + '</strong>';
+        html += '<button onclick="agregarDelServidor(' + i + ')">Agregar 🛒</button>';
+        html += '</div>';
+
+        html += '</div>';
+        html += '</article>';
+    }
+
+    contenedor.innerHTML = html;
+}
+
+// Agrega al carrito un producto que viene del servidor
+function agregarDelServidor(i) {
+    var p = productosServidor[i];
+    agregarCarrito(p.nombre, Number(p.precio));
 }
 
 
@@ -380,25 +444,4 @@ window.addEventListener("click", function(event) {
 ================================= */
 
 actualizarCarrito();
-const express = require("express");
-const path = require("path");
-
-const app = express();
-const PORT = 3000;
-
-// Sirve todo lo que esté dentro de /public (html, css, js, imágenes)
-app.use(express.static(path.join(__dirname, "public")));
-
-// Ejemplo de ruta propia (opcional)
-app.get("/api/saludo", (req, res) => {
-    res.json({ mensaje: "Bienvenidos a letras y aromas" });
-});
-
-// Si no existe la ruta, responde 404
-app.use((req, res) => {
-    res.status(404).send("Página no encontrada");
-});
-
-app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
-});
+cargarProductos();

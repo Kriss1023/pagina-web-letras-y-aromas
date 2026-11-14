@@ -6,7 +6,6 @@ const server = http.createServer((request, Response)=>{
         Response.end(Bienvenidos a letras y aromas)
     }
 })
-
 server.listen(3000,() =>{
 console.log("Servidor ejecutandose en el puerto 3000")
 })

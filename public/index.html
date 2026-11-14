@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-    <link rel="stylesheet" href="style.css">
-<script src="script.js"></script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,6 +31,7 @@
 
         <nav>
             <a href="#inicio">Inicio</a>
+            <a href="#novedades">Novedades</a>
             <a href="#libros">Libros</a>
             <a href="#velas">Velas</a>
             <a href="#nosotros">Nosotros</a>
@@ -130,6 +130,31 @@
         </div>
 
     </section>
+
+
+    <!-- NOVEDADES (productos que se agregan desde el admin) -->
+    <section id="novedades" class="productos-seccion">
+
+        <div class="titulo">
+
+            <span> Recién llegados</span>
+
+            <h2>Novedades</h2>
+
+            <p>
+                Los últimos productos que llegaron a la tienda.
+            </p>
+
+        </div>
+
+        <!-- Aquí el script.js dibuja los productos del servidor -->
+        <div class="productos" id="productosNuevos">
+            <p>Cargando productos...</p>
+        </div>
+
+    </section>
+
+
     <!-- LIBROS -->
     <section id="libros" class="productos-seccion">
 
@@ -293,6 +318,8 @@
                     <p>
                        Novela póstuma del escritor colombiano Gabriel García Márquez, 
                        publicada en marzo de 2024. 
+                    </p>
+
                     <div class="producto-abajo">
 
                         <strong>$15.00</strong>
