@@ -1778,3 +1778,53 @@ footer a:hover {
         scroll-behavior: auto !important;
     }
 }
+
+/* CARRITO COMPARTIDO */
+
+#listaCarrito .item-carrito {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+#listaCarrito .item-carrito > div:first-child {
+    flex: 1 1 130px;
+    min-width: 0;
+}
+
+.controles-cantidad {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#listaCarrito .controles-cantidad button {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.controles-cantidad span {
+    min-width: 17px;
+    text-align: center;
+    font-weight: 600;
+}
+
+#listaCarrito .quitar-carrito {
+    width: auto;
+    height: auto;
+    padding: 8px 11px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.aviso-carrito {
+    margin-top: 14px;
+    text-align: center;
+    color: var(--texto-suave);
+    font-size: 12px;
+    line-height: 1.6;
+}

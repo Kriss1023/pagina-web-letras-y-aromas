@@ -542,3 +542,40 @@ section#contacto.contacto-seccion {
         gap: 18px;
     }
 }
+
+/* Consentimiento para recibir novedades */
+
+.form-newsletter {
+    flex-wrap: wrap;
+}
+
+.form-newsletter .aceptacion {
+    flex: 1 0 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
+
+    margin-top: 8px;
+    color: var(--texto);
+
+    font-size: 12px;
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.form-newsletter .aceptacion input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+    flex: 0 0 auto;
+    padding: 0;
+    margin-top: 2px;
+
+    accent-color: var(--vino);
+}
+
+.comunidad .mensaje-suscripcion {
+    margin: 16px auto 0;
+    font-size: 13px;
+}

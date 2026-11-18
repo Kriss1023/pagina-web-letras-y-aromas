@@ -509,3 +509,36 @@
         font-size: 16px;
     }
 }
+/* Botón de compra de demostración */
+
+.boton-compra-demo {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    padding: 15px 20px;
+    background: #78465f;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.boton-compra-demo:hover {
+    background: #60354c;
+    transform: translateY(-2px);
+}
+
+.mensaje-compra-demo {
+    margin-top: 15px;
+    text-align: center;
+    color: #78465f;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.mensaje-compra-demo[hidden] {
+    display: none;
+}

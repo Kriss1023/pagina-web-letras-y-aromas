@@ -708,3 +708,27 @@ filtrar(
 
 actualizarCarrito();
 cargarProductos();
+/* COMPRA DE DEMOSTRACIÓN */
+
+document.getElementById("botonCompraDemo")
+    ?.addEventListener("click", () => {
+
+        const mensaje = document.getElementById(
+            "mensajeCompraDemo"
+        );
+
+        if (!mensaje) return;
+
+        if (carrito.length === 0) {
+            mensaje.textContent =
+                "Primero agrega un producto al carrito.";
+
+            mensaje.hidden = false;
+            return;
+        }
+
+        mensaje.textContent =
+            "¡Gracias por elegir Letras & Aromas! " +
+            "Esta es una compra de demostración. ";
+        mensaje.hidden = false;
+    });

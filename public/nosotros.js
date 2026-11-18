@@ -189,32 +189,85 @@ function comprar() {
    ÚNETE A NUESTRA COMUNIDAD
 ========================================= */
 
-function suscribirse(event) {
+
+async function suscribirse(event) {
     event.preventDefault();
 
-    const correo = document
-        .getElementById("correoNewsletter");
+    const formulario = event.currentTarget;
 
-    if (!correo || !correo.value.trim()) {
-        mostrarMensaje(
-            "Escribe tu correo electrónico."
-        );
+    const correo =
+        document.getElementById("correoNewsletter");
+
+    const acepto =
+        document.getElementById("aceptoComunidad");
+
+    const estado =
+        document.getElementById("estadoSuscripcion");
+
+    const boton =
+        formulario.querySelector('button[type="submit"]');
+
+    if (!correo || !acepto || !estado || !boton) {
+        return;
+    }
+
+    if (!acepto.checked) {
+        estado.textContent =
+            "Debes aceptar recibir novedades.";
 
         return;
     }
 
-    /*
-       Pendiente:
-       Crear una ruta en el servidor para
-       guardar las suscripciones en MongoDB.
+    boton.disabled = true;
+    boton.textContent = "Registrando...";
 
-       Por ahora no almacenamos el correo.
-    */
+    estado.textContent = "Guardando solicitud...";
 
-    mostrarMensaje(
-        "Las suscripciones estarán disponibles próximamente. " +
-        "Tu correo todavía no se ha registrado."
-    );
+    try {
+
+        const respuesta = await fetch(
+            "/api/suscripciones",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    correo: correo.value.trim(),
+                    consentimiento: true
+                })
+            }
+        );
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(
+                resultado.mensaje ||
+                "No se pudo registrar el correo."
+            );
+        }
+
+        estado.textContent = resultado.mensaje;
+        estado.style.color = "#28744d";
+
+        formulario.reset();
+
+    } catch (error) {
+
+        console.error("Error en la suscripción:", error);
+
+        estado.textContent =
+            error.message ||
+            "Ocurrió un problema al registrar el correo.";
+
+        estado.style.color = "#b3261e";
+
+    } finally {
+
+        boton.disabled = false;
+        boton.textContent = "Suscribirme";
+    }
 }
 
 /* =========================================

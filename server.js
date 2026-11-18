@@ -14,6 +14,13 @@ const PORT = process.env.PORT || 3000;
 // Configuración general
 app.use(express.json({ limit: "10kb" }));
 
+// Suscripciones de la comunidad
+app.use(
+    "/api/suscripciones",
+    require("./routes/suscripciones.js")
+);
+
+// Direcciones permitidas
 const origenesPermitidos = [
     "http://127.0.0.1:5500",
     "http://localhost:5500"
