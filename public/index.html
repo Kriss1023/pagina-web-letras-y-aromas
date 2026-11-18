@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -24,45 +25,40 @@
 
         <div class="logo-container">
             <img src="carpeta de imagenes/LOGO.jpeg" alt="Letras & Aromas">
+
             <div>
                 <h2>Letras & Aromas</h2>
                 <span>Historias que iluminan</span>
             </div>
         </div>
-        
 
-    
-     <nav>
-        <a href="#inicio">Inicio</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="catalogo.html?tipo=libros">Libros</a>
-        <a href="catalogo.html?tipo=velas">Velas</a>
-        <a href="#nosotros">Nosotros</a>
-     </nav>
-
+        <nav>
+            <a href="#inicio">Inicio</a>
+            <a href="catalogo.html">Catálogo</a>
+            <a href="catalogo.html?tipo=libros">Libros</a>
+            <a href="catalogo.html?tipo=velas">Velas</a>
+            <a href="#nosotros">Nosotros</a>
+        </nav>
 
         <div class="acciones">
-
-            <button onclick="abrirLogin()" class="icono">
+            <button onclick="abrirLogin()" class="icono" type="button">
                 👤
             </button>
 
-            <button onclick="mostrarCarrito()" class="icono carrito-btn">
+            <button onclick="mostrarCarrito()" class="icono carrito-btn" type="button">
                 🛒
                 <span id="contador">0</span>
             </button>
-
         </div>
 
     </header>
-
 
     <!-- INICIO -->
     <section id="inicio" class="inicio">
 
         <div class="inicio-texto">
 
-            <span class="etiqueta"> Bienvenidos</span>
+            <span class="etiqueta">Bienvenidos</span>
 
             <h1>
                 Un buen libro,
@@ -77,37 +73,26 @@
                 y velas que crean ambientes llenos de magia.
             </p>
 
+            <div class="botones">
+                <a href="catalogo.html?tipo=libros" class="boton">
+                    Ver libros
+                </a>
 
-        <div class="botones">
-
-            <a href="catalogo.html?tipo=libros" class="boton">
-                Ver libros
-            </a>
-
-            <a href="catalogo.html?tipo=velas"
-               class="boton boton-secundario">
-                Ver velas
-            </a>
-
-         </div>
-
+                <a href="catalogo.html?tipo=velas"
+                   class="boton boton-secundario">
+                    Ver velas
+                </a>
+            </div>
 
         </div>
 
-
         <div class="inicio-logo">
-
-<div class="inicio-logo">
-    <div class="circulo">
-        <img src="carpeta de imagenes/LOGO.jpeg" alt="Letras & Aromas">
-    </div>
-</div>
-
-
+            <div class="circulo">
+                <img src="carpeta de imagenes/LOGO.jpeg" alt="Letras & Aromas">
+            </div>
         </div>
 
     </section>
-
 
     <!-- BENEFICIOS -->
     <section class="beneficios">
@@ -138,14 +123,35 @@
 
     </section>
 
+    <!-- NOVEDADES DESDE MONGODB -->
+    <section id="novedades" class="productos-seccion">
+
+        <div class="titulo">
+            <span>Recién llegados</span>
+            <h2>Novedades</h2>
+
+            <p>
+                Explora los productos disponibles en nuestra tienda.
+            </p>
+        </div>
+
+        <!-- Los productos se cargan desde script.js -->
+        <div class="productos" id="productosNuevos">
+            <p>Cargando productos...</p>
+        </div>
+
+    </section>
+
     <!-- PRODUCTOS DESTACADOS -->
     <section id="destacados" class="productos-seccion">
 
         <div class="titulo">
             <span>Nuestra selección</span>
             <h2>Productos destacados</h2>
+
             <p>
-                Descubre algunas de nuestras historias y aromas favoritos.
+                Descubre algunas de nuestras historias
+                y aromas favoritos.
             </p>
         </div>
 
@@ -153,11 +159,15 @@
 
             <!-- PRODUCTO 1 -->
             <article class="producto">
+
                 <div class="producto-imagen libro1">
-                    <img src="carpeta de imagenes/orgullo y prejuicio.jpg" alt="Portada de Orgullo y prejuicio">
+                    <img
+                        src="carpeta de imagenes/orgullo y prejuicio.jpg"
+                        alt="Portada de Orgullo y prejuicio">
                 </div>
 
                 <div class="producto-info">
+
                     <span class="categoria">NOVELA</span>
                     <h3>Orgullo y prejuicio</h3>
 
@@ -168,20 +178,26 @@
 
                     <div class="producto-abajo">
                         <strong>$22.00</strong>
+
                         <a href="catalogo.html" class="boton">
                             Ver producto
                         </a>
                     </div>
+
                 </div>
             </article>
 
             <!-- PRODUCTO 2 -->
             <article class="producto">
+
                 <div class="producto-imagen libro1">
-                    <img src="carpeta de imagenes/la metamorfosis.jpg" alt="Portada de La metamorfosis">
+                    <img
+                        src="carpeta de imagenes/la metamorfosis.jpg"
+                        alt="Portada de La metamorfosis">
                 </div>
 
                 <div class="producto-info">
+
                     <span class="categoria">NOVELA CORTA</span>
                     <h3>La metamorfosis</h3>
 
@@ -192,34 +208,42 @@
 
                     <div class="producto-abajo">
                         <strong>$9.00</strong>
+
                         <a href="catalogo.html" class="boton">
                             Ver producto
                         </a>
                     </div>
+
                 </div>
             </article>
 
             <!-- PRODUCTO 3 -->
             <article class="producto">
+
                 <div class="producto-imagen vela-lavanda">
-                    <img src="carpeta de imagenes/vela-lavanda.jfif" alt="Vela aromática de lavanda">
+                    <img
+                        src="carpeta de imagenes/vela-lavanda.jfif"
+                        alt="Vela aromática de lavanda">
                 </div>
 
                 <div class="producto-info">
+
                     <span class="categoria">RELAX</span>
                     <h3>Vela de lavanda</h3>
 
                     <p>
-                        Un aroma floral para crear un
-                        ambiente tranquilo y acogedor.
+                        Un aroma floral para crear un ambiente
+                        tranquilo y acogedor.
                     </p>
 
                     <div class="producto-abajo">
                         <strong>$12.00</strong>
+
                         <a href="catalogo.html" class="boton">
                             Ver producto
                         </a>
                     </div>
+
                 </div>
             </article>
 
@@ -237,13 +261,14 @@
     <section id="nosotros" class="nosotros">
 
         <div class="nosotros-imagen">
-            <img src="carpeta de imagenes/letras y aromas.jpg" alt="fusion de contenidos">
-
+            <img
+                src="carpeta de imagenes/letras y aromas.jpg"
+                alt="Libros y velas de Letras & Aromas">
         </div>
 
         <div class="nosotros-texto">
 
-            <span> Nuestra historia</span>
+            <span>Nuestra historia</span>
 
             <h2>
                 Letras que cuentan historias,
@@ -262,17 +287,21 @@
                 imaginación y bienestar.
             </p>
 
-            <button class="boton" onclick="mostrarMensaje('¡Gracias por visitarnos! ')">
+            <button
+                class="boton"
+                type="button"
+                onclick="mostrarMensaje('¡Gracias por visitarnos!')">
                 Conocer más
             </button>
 
         </div>
 
     </section>
+
     <!-- NEWSLETTER -->
     <section class="newsletter">
 
-        <h2>Únete a nuestra comunidad </h2>
+        <h2>Únete a nuestra comunidad</h2>
 
         <p>
             Recibe novedades, recomendaciones y promociones.
@@ -280,7 +309,11 @@
 
         <form onsubmit="suscribirse(event)">
 
-            <input type="email" id="correoNewsletter" placeholder="Tu correo electrónico" required>
+            <input
+                type="email"
+                id="correoNewsletter"
+                placeholder="Tu correo electrónico"
+                required>
 
             <button type="submit">
                 Suscribirme
@@ -290,84 +323,92 @@
 
     </section>
 
-<!-- SECCIÓN DE CONTACTO -->
-<section id="contacto" class="contacto">
-    <div class="contacto-contenido">
-        <h2>Contáctanos 💌</h2>
+    <!-- FORMULARIO DE CONTACTO -->
+    <section id="contacto" class="contacto">
 
-        <p>
-            ¿Tienes alguna pregunta sobre nuestros libros o velas?
-            ¡Nos encantaría escucharte!
-        </p>
+        <div class="contacto-contenido">
 
-        <form id="formularioContacto">
-            <label for="nombreContacto">Nombre</label>
-            <input
-                type="text"
-                id="nombreContacto"
-                placeholder="Tu nombre"
-                required
-            >
+            <h2>Contáctanos 💌</h2>
 
-            <label for="emailContacto">Correo electrónico</label>
-            <input
-                type="email"
-                id="emailContacto"
-                placeholder="Tu correo electrónico"
-                required
-            >
+            <p>
+                ¿Tienes alguna pregunta sobre nuestros libros o velas?
+                ¡Nos encantaría escucharte!
+            </p>
 
-            <label for="asuntoContacto">Asunto</label>
-            <input
-                type="text"
-                id="asuntoContacto"
-                placeholder="¿En qué podemos ayudarte?"
-                required
-            >
+            <form id="formularioContacto">
 
-            <label for="mensajeContacto">Mensaje</label>
-            <textarea
-                id="mensajeContacto"
-                rows="5"
-                placeholder="Escribe tu mensaje aquí..."
-                required
-            ></textarea>
+                <label for="nombreContacto">
+                    Nombre
+                </label>
 
-            <button type="submit">Enviar mensaje 💜</button>
+                <input
+                    type="text"
+                    id="nombreContacto"
+                    maxlength="100"
+                    placeholder="Tu nombre"
+                    required>
 
-            <p id="respuestaContacto" role="status"></p>
-        </form>
-    </div>
-</section>
+                <label for="emailContacto">
+                    Correo electrónico
+                </label>
 
+                <input
+                    type="email"
+                    id="emailContacto"
+                    maxlength="254"
+                    placeholder="Tu correo electrónico"
+                    required>
+
+                <label for="asuntoContacto">
+                    Asunto
+                </label>
+
+                <input
+                    type="text"
+                    id="asuntoContacto"
+                    maxlength="150"
+                    placeholder="¿En qué podemos ayudarte?"
+                    required>
+
+                <label for="mensajeContacto">
+                    Mensaje
+                </label>
+
+                <textarea
+                    id="mensajeContacto"
+                    rows="5"
+                    maxlength="2000"
+                    placeholder="Escribe tu mensaje aquí..."
+                    required></textarea>
+
+                <button type="submit">
+                    Enviar mensaje 💜
+                </button>
+
+                <p id="respuestaContacto" role="status"></p>
+
+            </form>
+
+        </div>
+
+    </section>
 
     <!-- FOOTER -->
     <footer>
 
         <div>
-
             <h2>Letras & Aromas</h2>
-
-            <p>
-                Historias que iluminan
-            </p>
-
+            <p>Historias que iluminan</p>
         </div>
 
         <div>
-
             <h3>Contacto</h3>
-
-            <p> contacto@letrasyaromas.com</p>
-
+            <p>aromasletras@gmail.com</p>
         </div>
 
         <div>
-
             <h3>Síguenos</h3>
-
             <p>Instagram · Facebook · TikTok</p>
-
         </div>
 
     </footer>
@@ -377,17 +418,33 @@
 
         <div class="ventana-contenido">
 
-            <button class="cerrar" onclick="cerrarLogin()">×</button>
+            <button
+                class="cerrar"
+                type="button"
+                onclick="cerrarLogin()">
+                ×
+            </button>
 
             <h2>👤 Iniciar sesión</h2>
 
-            <p>Bienvenido nuevamente </p>
+            <p>
+                Acceso de demostración.
+                No utilices contraseñas reales.
+            </p>
 
             <form onsubmit="iniciarSesion(event)">
 
-                <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="Correo electrónico"
+                    required>
 
-                <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Contraseña"
+                    required>
 
                 <button class="boton-cuenta" type="submit">
                     Iniciar sesión
@@ -397,7 +454,8 @@
 
             <p class="cambiar-formulario">
                 ¿No tienes una cuenta?
-                <button onclick="abrirRegistro()">
+
+                <button type="button" onclick="abrirRegistro()">
                     Regístrate
                 </button>
             </p>
@@ -406,25 +464,44 @@
 
     </div>
 
-
     <!-- MODAL REGISTRO -->
     <div id="modalRegistro" class="ventana">
 
         <div class="ventana-contenido">
 
-            <button class="cerrar" onclick="cerrarRegistro()">×</button>
+            <button
+                class="cerrar"
+                type="button"
+                onclick="cerrarRegistro()">
+                ×
+            </button>
 
             <h2>Crear cuenta</h2>
 
-            <p>Únete a Letras & Aromas</p>
+            <p>
+                Registro de demostración.
+                No utilices contraseñas reales.
+            </p>
 
             <form onsubmit="registrarse(event)">
 
-                <input type="text" id="registroNombre" placeholder="Tu nombre" required>
+                <input
+                    type="text"
+                    id="registroNombre"
+                    placeholder="Tu nombre"
+                    required>
 
-                <input type="email" id="registroEmail" placeholder="Correo electrónico" required>
+                <input
+                    type="email"
+                    id="registroEmail"
+                    placeholder="Correo electrónico"
+                    required>
 
-                <input type="password" id="registroPassword" placeholder="Contraseña" required>
+                <input
+                    type="password"
+                    id="registroPassword"
+                    placeholder="Contraseña"
+                    required>
 
                 <button class="boton-cuenta" type="submit">
                     Crear cuenta
@@ -434,7 +511,8 @@
 
             <p class="cambiar-formulario">
                 ¿Ya tienes una cuenta?
-                <button onclick="abrirLogin()">
+
+                <button type="button" onclick="abrirLogin()">
                     Iniciar sesión
                 </button>
             </p>
@@ -448,12 +526,17 @@
 
         <div class="ventana-contenido carrito">
 
-            <button class="cerrar" onclick="cerrarCarrito()">×</button>
+            <button
+                class="cerrar"
+                type="button"
+                onclick="cerrarCarrito()">
+                ×
+            </button>
 
             <h2>🛒 Mi carrito</h2>
 
             <div id="listaCarrito">
-                <p>Tu carrito está vacío </p>
+                <p>Tu carrito está vacío</p>
             </div>
 
             <div class="total">
@@ -466,18 +549,23 @@
 
             </div>
 
-            <button class="boton-cuenta" onclick="comprar()">
+            <button
+                class="boton-cuenta"
+                type="button"
+                onclick="comprar()">
                 Comprar
             </button>
 
         </div>
 
     </div>
-    <!-- MENSAJE -->
+
+    <!-- MENSAJE EMERGENTE -->
     <div id="mensaje" class="mensaje">
         ¡Producto agregado!
     </div>
 
+    <!-- JAVASCRIPT -->
     <script src="script.js"></script>
 
 </body>

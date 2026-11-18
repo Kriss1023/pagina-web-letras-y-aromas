@@ -1,205 +1,331 @@
 
 require("dotenv").config();
 
-const http = require("http");
+const express = require("express");
+const path = require("path");
 const mongoose = require("mongoose");
 
 const Producto = require("./models/producto.js");
 const Contacto = require("./models/contacto.js");
 
+const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Direcciones permitidas durante el desarrollo
+// Configuración general
+app.use(express.json({ limit: "10kb" }));
+
 const origenesPermitidos = [
     "http://127.0.0.1:5500",
     "http://localhost:5500"
 ];
 
-// Función para enviar respuestas JSON
-function enviarJSON(response, estado, datos) {
-    response.writeHead(estado, {
-        "Content-Type": "application/json; charset=utf-8"
-    });
-
-    response.end(JSON.stringify(datos));
-}
-
-// Crear servidor
-const server = http.createServer(async (request, response) => {
-
-    // CONFIGURACIÓN DE CORS
-    const origen = request.headers.origin;
+app.use((req, res, next) => {
+    const origen = req.headers.origin;
 
     if (origenesPermitidos.includes(origen)) {
-        response.setHeader("Access-Control-Allow-Origin", origen);
-        response.setHeader("Vary", "Origin");
+        res.setHeader("Access-Control-Allow-Origin", origen);
+        res.setHeader("Vary", "Origin");
     }
 
-    response.setHeader(
+    res.setHeader(
         "Access-Control-Allow-Methods",
-        "GET, POST, OPTIONS"
+        "GET, POST, PUT, DELETE, OPTIONS"
     );
 
-    response.setHeader(
+    res.setHeader(
         "Access-Control-Allow-Headers",
-        "Content-Type"
+        "Content-Type, Authorization"
     );
 
-    // Responder solicitudes OPTIONS
-    if (request.method === "OPTIONS") {
-        response.writeHead(204);
-        response.end();
-        return;
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
     }
 
-    // PÁGINA PRINCIPAL DEL SERVIDOR
-    if (request.method === "GET" && request.url === "/") {
+    next();
+});
 
-        response.writeHead(200, {
-            "Content-Type": "text/plain; charset=utf-8"
-        });
+// Protección del administrador
+function protegerAdmin(req, res, next) {
+    const usuarioConfigurado = process.env.ADMIN_USER;
+    const claveConfigurada = process.env.ADMIN_PASS;
 
-        response.end("Bienvenidos a Letras y Aromas");
+    if (!usuarioConfigurado || !claveConfigurada) {
+        return res.status(503).send(
+            "Panel administrativo sin configurar"
+        );
+    }
 
-    // CONSULTAR PRODUCTOS DESDE MONGODB
-    } else if (
-        request.method === "GET" &&
-        request.url === "/api/productos"
-    ) {
+    const autorizacion = req.headers.authorization || "";
+    const partes = autorizacion.split(" ");
 
-        try {
-            const productos = await Producto.find();
+    if (partes[0] === "Basic" && partes[1]) {
+        const credenciales = Buffer.from(
+            partes[1],
+            "base64"
+        ).toString("utf8");
 
-            enviarJSON(response, 200, productos);
+        const separador = credenciales.indexOf(":");
 
-        } catch (error) {
-            console.error(
-                "Error al consultar productos:",
-                error.message
-            );
+        const usuario = credenciales.slice(0, separador);
+        const clave = credenciales.slice(separador + 1);
 
-            enviarJSON(response, 500, {
-                mensaje: "Error al obtener los productos"
-            });
+        if (
+            separador !== -1 &&
+            usuario === usuarioConfigurado &&
+            clave === claveConfigurada
+        ) {
+            return next();
         }
+    }
 
-    // GUARDAR MENSAJES DEL FORMULARIO DE CONTACTO
-    } else if (
-        request.method === "POST" &&
-        request.url === "/api/contacto"
-    ) {
+    res.set(
+        "WWW-Authenticate",
+        'Basic realm="Administracion Letras y Aromas"'
+    );
 
-        try {
-            let cuerpo = "";
-            let bytesRecibidos = 0;
-            const LIMITE = 10000;
+    return res.status(401).send("Acceso restringido");
+}
 
-            // Recibir los datos enviados por el formulario
-            for await (const fragmento of request) {
-                bytesRecibidos += fragmento.length;
+// Validar información de productos
 
-                if (bytesRecibidos > LIMITE) {
-                    enviarJSON(response, 413, {
-                        mensaje: "El mensaje es demasiado grande"
-                    });
-                    return;
-                }
+function revisarProducto(body) {
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return { error: "Datos de producto inválidos" };
+    }
 
-                cuerpo += fragmento.toString("utf8");
-            }
+    const nombre = String(body.nombre || "").trim();
+    const tipo = String(body.tipo || "").trim().toLowerCase();
+    const categoria = String(body.categoria || "").trim();
+    const precio = Number(body.precio);
+    const stock = Number(body.stock);
 
-            // Convertir los datos JSON en un objeto
-            let datos;
+    if (!nombre) {
+        return { error: "El nombre es obligatorio" };
+    }
 
-            try {
-                datos = JSON.parse(cuerpo);
-            } catch {
-                enviarJSON(response, 400, {
-                    mensaje: "Los datos enviados no son válidos"
-                });
-                return;
-            }
+    if (!["libros", "velas"].includes(tipo)) {
+        return {
+            error: "Selecciona si el producto es un libro o una vela"
+        };
+    }
 
-            if (
-                !datos ||
-                typeof datos !== "object" ||
-                Array.isArray(datos)
-            ) {
-                enviarJSON(response, 400, {
-                    mensaje: "Formato de datos incorrecto"
-                });
-                return;
-            }
+    if (!categoria) {
+        return { error: "La categoría es obligatoria" };
+    }
 
-            // Validar los datos del formulario
-            const campos = ["nombre", "email", "asunto", "mensaje"];
+    if (!Number.isFinite(precio) || precio < 0) {
+        return { error: "Precio inválido" };
+    }
 
-            if (campos.some(campo => typeof datos[campo] !== "string")) {
-                enviarJSON(response, 400, {
-                    mensaje: "Todos los campos deben contener texto"
-                });
-                return;
-            }
+    if (!Number.isInteger(stock) || stock < 0) {
+        return { error: "Stock inválido" };
+    }
 
-            const nombre = datos.nombre.trim();
-            const email = datos.email.trim();
-            const asunto = datos.asunto.trim();
-            const mensaje = datos.mensaje.trim();
-
-            const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-            if (
-                !nombre ||
-                !email ||
-                !asunto ||
-                !mensaje ||
-                !correoValido ||
-                nombre.length > 100 ||
-                email.length > 254 ||
-                asunto.length > 150 ||
-                mensaje.length > 2000
-            ) {
-                enviarJSON(response, 400, {
-                    mensaje: "Revisa los datos del formulario"
-                });
-                return;
-            }
-
-            // Guardar el mensaje en MongoDB
-            await Contacto.create({
-                nombre,
-                email,
-                asunto,
-                mensaje
-            });
-
-            console.log("Nuevo mensaje de contacto guardado");
-
-            enviarJSON(response, 201, {
-                mensaje: "¡Tu mensaje fue enviado correctamente!"
-            });
-
-        } catch (error) {
-            console.error(
-                "Error al guardar contacto:",
-                error.message
-            );
-
-            enviarJSON(response, 500, {
-                mensaje: "No se pudo guardar el mensaje"
-            });
+    return {
+        datos: {
+            nombre,
+            tipo,
+            categoria,
+            precio,
+            stock,
+            imagen: String(body.imagen || "").trim(),
+            descripcion: String(body.descripcion || "").trim()
         }
+    };
+}
 
-    // RUTA NO ENCONTRADA
-    } else {
 
-        enviarJSON(response, 404, {
-            mensaje: "Ruta no encontrada"
+// API pública: productos
+app.get("/api/productos", async (req, res) => {
+    try {
+        const productos = await Producto.find().lean();
+        res.json(productos);
+    } catch (error) {
+        console.error("Error al consultar productos:", error.message);
+
+        res.status(500).json({
+            mensaje: "Error al obtener los productos"
         });
     }
 });
 
-// CONECTAR MONGODB E INICIAR SERVIDOR
+// API pública: contacto
+app.post("/api/contacto", async (req, res) => {
+    try {
+        const datos = req.body;
+
+        if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
+            return res.status(400).json({
+                mensaje: "Formato de datos incorrecto"
+            });
+        }
+
+        const campos = ["nombre", "email", "asunto", "mensaje"];
+
+        if (campos.some(campo => typeof datos[campo] !== "string")) {
+            return res.status(400).json({
+                mensaje: "Todos los campos deben contener texto"
+            });
+        }
+
+        const nombre = datos.nombre.trim();
+        const email = datos.email.trim();
+        const asunto = datos.asunto.trim();
+        const mensaje = datos.mensaje.trim();
+
+        const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (
+            !nombre || !email || !asunto || !mensaje ||
+            !correoValido ||
+            nombre.length > 100 ||
+            email.length > 254 ||
+            asunto.length > 150 ||
+            mensaje.length > 2000
+        ) {
+            return res.status(400).json({
+                mensaje: "Revisa los datos del formulario"
+            });
+        }
+
+        await Contacto.create({
+            nombre,
+            email,
+            asunto,
+            mensaje
+        });
+
+        console.log("Nuevo mensaje de contacto guardado");
+
+        res.status(201).json({
+            mensaje: "¡Tu mensaje fue enviado correctamente!"
+        });
+
+    } catch (error) {
+        console.error("Error al guardar contacto:", error.message);
+
+        res.status(500).json({
+            mensaje: "No se pudo guardar el mensaje"
+        });
+    }
+});
+
+// Todas las rutas del administrador requieren autorización
+app.use("/admin", protegerAdmin);
+
+// Consultar productos desde el administrador
+app.get("/admin/api/productos", async (req, res) => {
+    try {
+        const productos = await Producto.find()
+            .sort({ createdAt: -1 })
+            .lean();
+
+        res.json(productos);
+    } catch (error) {
+        res.status(500).json({
+            error: "No se pudieron consultar los productos"
+        });
+    }
+});
+
+// Crear producto
+app.post("/admin/api/productos", async (req, res) => {
+    try {
+        const resultado = revisarProducto(req.body);
+
+        if (resultado.error) {
+            return res.status(400).json({
+                error: resultado.error
+            });
+        }
+
+        const producto = await Producto.create(resultado.datos);
+
+        res.status(201).json(producto);
+    } catch (error) {
+        console.error("Error al crear producto:", error.message);
+
+        res.status(500).json({
+            error: "No se pudo crear el producto"
+        });
+    }
+});
+
+// Actualizar producto
+app.put("/admin/api/productos/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                error: "Identificador inválido"
+            });
+        }
+
+        const resultado = revisarProducto(req.body);
+
+        if (resultado.error) {
+            return res.status(400).json({
+                error: resultado.error
+            });
+        }
+
+        const producto = await Producto.findByIdAndUpdate(
+            req.params.id,
+            { $set: resultado.datos },
+            { new: true, runValidators: true }
+        );
+
+        if (!producto) {
+            return res.status(404).json({
+                error: "Producto no encontrado"
+            });
+        }
+
+        res.json(producto);
+    } catch (error) {
+        res.status(500).json({
+            error: "No se pudo actualizar el producto"
+        });
+    }
+});
+
+// Eliminar producto
+app.delete("/admin/api/productos/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                error: "Identificador inválido"
+            });
+        }
+
+        const producto = await Producto.findByIdAndDelete(
+            req.params.id
+        );
+
+        if (!producto) {
+            return res.status(404).json({
+                error: "Producto no encontrado"
+            });
+        }
+
+        res.json({ ok: true });
+    } catch (error) {
+        res.status(500).json({
+            error: "No se pudo eliminar el producto"
+        });
+    }
+});
+
+// Archivos de la página principal y del administrador
+app.use(
+    "/admin",
+    express.static(path.join(__dirname, "admin.html"))
+);
+
+app.use(
+    express.static(path.join(__dirname, "public"))
+);
+
+// Iniciar MongoDB y el servidor
 async function iniciarServidor() {
     try {
         if (!process.env.MONGODB_URI) {
@@ -214,7 +340,7 @@ async function iniciarServidor() {
 
         console.log("MongoDB conectado correctamente");
 
-        server.listen(PORT, () => {
+        app.listen(PORT, () => {
             console.log(
                 `Servidor ejecutándose en el puerto ${PORT}`
             );
@@ -222,7 +348,7 @@ async function iniciarServidor() {
 
     } catch (error) {
         console.error(
-            "Error al conectar con MongoDB:",
+            "Error al iniciar servidor:",
             error.message
         );
 
