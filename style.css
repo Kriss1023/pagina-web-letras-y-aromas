@@ -1224,4 +1224,142 @@ footer p {
         text-align: center;
     }
 
+/* FORMULARIO DE CONTACTO */
+
+.contacto {
+    padding: 70px 20px;
+    background: linear-gradient(135deg, #fff2f5, #f5edf9);
+    text-align: center;
+}
+
+.contacto-contenido {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contacto h2 {
+    color: #75445d;
+    font-size: 2.3rem;
+    margin-bottom: 15px;
+}
+
+.contacto p {
+    color: #765b6b;
+    margin-bottom: 25px;
+}
+
+#formularioContacto {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(80, 40, 60, 0.1);
+}
+
+#formularioContacto label {
+    color: #75445d;
+    font-weight: bold;
+}
+
+#formularioContacto input,
+#formularioContacto textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    border: 1px solid #d8bfc9;
+    border-radius: 10px;
+    font: inherit;
+}
+
+#formularioContacto button {
+    background: #75445d;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#formularioContacto button:hover {
+    background: #593247;
+}
+
+#respuestaContacto {
+    margin: 0;
+    text-align: center;
+}
+
+}
+/* CONTACTO - LETRAS & AROMAS */
+
+section#contacto {
+    padding: 70px 20px;
+    background: linear-gradient(135deg, #fff2f5, #f5edf9);
+    text-align: center;
+}
+
+#contacto .contacto-contenido {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#contacto h2 {
+    color: #75445d;
+    font-size: 2.3rem;
+    margin-bottom: 15px;
+}
+
+#contacto .contacto-contenido > p {
+    color: #765b6b;
+    margin-bottom: 25px;
+}
+
+#formularioContacto {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(80, 40, 60, 0.1);
+}
+
+#formularioContacto label {
+    color: #75445d;
+    font-weight: bold;
+}
+
+#formularioContacto input,
+#formularioContacto textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    border: 1px solid #d8bfc9;
+    border-radius: 10px;
+    font: inherit;
+}
+
+#formularioContacto button {
+    background: #75445d;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#formularioContacto button:hover {
+    background: #593247;
+}
+
+#respuestaContacto {
+    margin: 0;
+    text-align: center;
 }

@@ -380,3 +380,54 @@ window.addEventListener("click", function(event) {
 ================================= */
 
 actualizarCarrito();
+
+/* FORMULARIO DE CONTACTO - LETRAS & AROMAS */
+
+const formularioContacto = document.getElementById("formularioContacto");
+
+if (formularioContacto) {
+    formularioContacto.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const respuestaContacto = document.getElementById("respuestaContacto");
+        const botonEnviar = formularioContacto.querySelector('button[type="submit"]');
+
+        const datos = {
+            nombre: document.getElementById("nombreContacto").value.trim(),
+            email: document.getElementById("emailContacto").value.trim(),
+            asunto: document.getElementById("asuntoContacto").value.trim(),
+            mensaje: document.getElementById("mensajeContacto").value.trim()
+        };
+
+        botonEnviar.disabled = true;
+        respuestaContacto.textContent = "Enviando mensaje...";
+
+        try {
+            const respuesta = await fetch("http://localhost:3000/api/contacto", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await respuesta.json();
+
+            if (!respuesta.ok) {
+                throw new Error(resultado.mensaje || "No se pudo enviar el mensaje");
+            }
+
+            respuestaContacto.textContent = resultado.mensaje;
+            respuestaContacto.style.color = "green";
+
+            formularioContacto.reset();
+
+        } catch (error) {
+            respuestaContacto.textContent = error.message;
+            respuestaContacto.style.color = "red";
+
+        } finally {
+            botonEnviar.disabled = false;
+        }
+    });
+}

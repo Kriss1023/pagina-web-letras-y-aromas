@@ -1,21 +1,32 @@
 {
   "name": "pagina-web-letras-aromas",
   "version": "1.0.0",
-  "description": "",
-  "main": "script.js",
+  "description": "Tienda virtual de letras y aromomas",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "echo \"No hay pruebas configuradas\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Kriss1023/pagina-web-letras-y-aromas.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "Libros",
+    "Velas",
+    "Aromas",
+    "Tienda virtual"
+  ],
+  "author": "Kristel Torres, Isaac Arévalo",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Kriss1023/pagina-web-letras-y-aromas/issues"
   },
-  "homepage": "https://github.com/Kriss1023/pagina-web-letras-y-aromas#readme"
+  "homepage": "https://github.com/Kriss1023/pagina-web-letras-y-aromas#readme",
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "mongoose": "^9.12.0"
+  }
 }
