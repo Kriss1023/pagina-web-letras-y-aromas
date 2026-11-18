@@ -2,7 +2,7 @@
 require("dotenv").config();
 
 const mongoose = require("mongoose");
-const Producto = require("./models/Producto");
+const Producto = require("./models/producto.js");
 
 // Productos de Letras & Aromas
 const productos = [

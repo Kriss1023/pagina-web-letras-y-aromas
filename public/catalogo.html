@@ -1,115 +1,581 @@
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-  content="width=device-width, initial-scale=1.0">
-  <title>
-    Catálogo | Letras & Aromas
-  </title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500;600;700&display=swap"
-  rel="stylesheet">
-  <style>
-    .catalogo-encabezado {text-align:center;padding:65px 20px 20px}
-    .catalogo-encabezado h1 {font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);margin:10px 0}
-    .catalogo-filtros {display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:20px 0 40px}
-    .catalogo-filtros button {border:1px solid #b8a69a;background:#fff;color:#382d29;padding:11px 20px;border-radius:24px;cursor:pointer;font:inherit}
-    .catalogo-filtros button[aria-pressed="true"] {background:#382d29;color:#fff}
-    .catalogo-vacio {text-align:center;padding:30px}
-    .catalogo-volver {display:inline-block;margin-top:16px}
-    .catalogo-seccion[hidden] {display:none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Explora nuestra colección de libros y velas en Letras & Aromas.">
+
+    <title>Catálogo | Letras & Aromas</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="catalogo.css">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
-  <header class="navbar">
-    <div class="logo-container">
-      <img src="carpeta de imagenes/LOGO.jpeg"
-      alt="Logo de Letras y Aromas">
-      <div>
-        <h2>Letras & Aromas</h2>
-        <span>Historias que iluminan</span></div>
+
+    <!-- =====================================
+         ENCABEZADO
+    ====================================== -->
+
+    <header class="navbar">
+
+        <a href="index.html"
+           class="logo-container"
+           aria-label="Letras y Aromas - Inicio">
+
+            <img
+                src="carpeta de imagenes/LOGO.jpeg"
+                alt="Logo de Letras & Aromas"
+                class="logo">
+
+            <div class="logo-texto">
+                <h2>Letras & Aromas</h2>
+                <span>Historias que iluminan</span>
+            </div>
+
+        </a>
+
+        <nav class="navegacion"
+             aria-label="Navegación principal">
+
+            <a href="index.html"
+               class="nav-boton">
+                Inicio
+            </a>
+
+            <a href="catalogo.html"
+               class="nav-boton activo"
+               aria-current="page">
+                Catálogo
+            </a>
+
+            <a href="nosotros.html"
+               class="nav-boton">
+                Nosotros
+            </a>
+
+        </nav>
+
+        <div class="acciones">
+
+            <!-- Usuario -->
+
+            <button
+                type="button"
+                class="icono usuario-btn"
+                id="abrirLogin"
+                aria-label="Iniciar sesión"
+                title="Mi cuenta">
+
+                <svg
+                    width="26"
+                    height="26"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true">
+
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4 21a8 8 0 0 1 16 0"></path>
+
+                </svg>
+
+            </button>
+
+            <!-- Carrito -->
+
+            <button
+                type="button"
+                class="icono carrito-btn"
+                id="abrirCarrito"
+                aria-label="Abrir carrito"
+                title="Mi carrito">
+
+                <svg
+                    width="26"
+                    height="26"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true">
+
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+
+                    <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+
+                </svg>
+
+                <span id="contador">0</span>
+
+            </button>
+
+        </div>
+
+    </header>
+
+    <!-- =====================================
+         CONTENIDO DEL CATÁLOGO
+    ====================================== -->
+
+    <main>
+
+        <!-- PRESENTACIÓN -->
+
+        <section class="catalogo-encabezado">
+
+            <span class="etiqueta">
+                Nuestra colección
+            </span>
+
+            <h1>
+                Catálogo de Letras & Aromas
+            </h1>
+
+            <p>
+                Encuentra historias para leer y aromas
+                para acompañarlas.
+            </p>
+
+            <!-- BOTONES DE FILTRADO -->
+
+            <div class="catalogo-filtros"
+                 role="group"
+                 aria-label="Filtrar productos">
+
+                <button
+                    type="button"
+                    class="filtro activo"
+                    data-filtro="todos"
+                    aria-pressed="true">
+                    Todos
+                </button>
+
+                <button
+                    type="button"
+                    class="filtro"
+                    data-filtro="libros"
+                    aria-pressed="false">
+                    Libros
+                </button>
+
+                <button
+                    type="button"
+                    class="filtro"
+                    data-filtro="velas"
+                    aria-pressed="false">
+                    Velas
+                </button>
+
+                <button
+                    type="button"
+                    class="filtro"
+                    data-filtro="destacados"
+                    aria-pressed="false">
+                    Destacados
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             DESTACADOS
+        ====================================== -->
+
+        <section
+            id="destacados"
+            class="productos-seccion catalogo-seccion destacados">
+
+            <div class="titulo">
+
+                <span>
+                    Nuestra selección
+                </span>
+
+                <h2>Destacados</h2>
+
+                <p>
+                    Una selección especial de historias
+                    y aromas para descubrir.
+                </p>
+
+            </div>
+
+            <!--
+                Productos destacados:
+
+                Libros:
+                - Orgullo y prejuicio
+                - En agosto nos vemos
+                - El jardín secreto
+
+                Velas:
+                - Manzana y canela
+                - Lavanda
+
+                Estos productos se obtendrán
+                desde MongoDB en catalogo.js.
+            -->
+
+            <div
+                id="productosDestacados"
+                class="productos productos-destacados"
+                aria-live="polite">
+
+                <p class="catalogo-vacio">
+                    Cargando destacados...
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             LIBROS
+        ====================================== -->
+
+        <section
+            id="libros"
+            class="productos-seccion catalogo-seccion">
+
+            <div class="titulo">
+
+                <span>
+                    Nuestra colección
+                </span>
+
+                <h2>Libros</h2>
+
+                <p>
+                    Historias para perderte, soñar
+                    y descubrir nuevos mundos.
+                </p>
+
+            </div>
+
+            <div
+                id="productosLibros"
+                class="productos"
+                aria-live="polite">
+
+                <p class="catalogo-vacio">
+                    Cargando libros...
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             VELAS
+        ====================================== -->
+
+        <section
+            id="velas"
+            class="productos-seccion catalogo-seccion velas">
+
+            <div class="titulo">
+
+                <span>
+                    Aromas especiales
+                </span>
+
+                <h2>Velas</h2>
+
+                <p>
+                    Aromas para acompañar tus momentos
+                    favoritos y crear espacios acogedores.
+                </p>
+
+            </div>
+
+            <div
+                id="productosVelas"
+                class="productos"
+                aria-live="polite">
+
+                <p class="catalogo-vacio">
+                    Cargando velas...
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PÁGINA
+    ====================================== -->
+
+    <footer>
+
+        <div>
+            <h2>Letras & Aromas</h2>
+            <p>Historias que iluminan</p>
+        </div>
+
+        <div>
+            <h3>Contacto</h3>
+            <p>contacto@letrasyaromas.com</p>
+        </div>
+
+    </footer>
+
+    <!-- =====================================
+         VENTANA DE INICIO DE SESIÓN
+    ====================================== -->
+
+    <div
+        id="modalLogin"
+        class="ventana"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloLogin">
+
+        <div class="ventana-contenido">
+
+            <button
+                type="button"
+                class="cerrar"
+                id="cerrarLogin"
+                aria-label="Cerrar">
+                &times;
+            </button>
+
+            <h2 id="tituloLogin">
+                Iniciar sesión
+            </h2>
+
+            <p>
+                Acceso de demostración.
+                No utilices contraseñas reales.
+            </p>
+
+            <form id="formularioLogin">
+
+                <label for="loginEmail">
+                    Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="Tu correo electrónico"
+                    autocomplete="email"
+                    required>
+
+                <label for="loginPassword">
+                    Contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Tu contraseña"
+                    autocomplete="current-password"
+                    required>
+
+                <button
+                    type="submit"
+                    class="boton-cuenta">
+                    Iniciar sesión
+                </button>
+
+            </form>
+
+            <p class="cambiar-formulario">
+
+                ¿No tienes una cuenta?
+
+                <button
+                    type="button"
+                    id="irRegistro">
+                    Regístrate
+                </button>
+
+            </p>
+
+        </div>
+
     </div>
 
-<nav>
-    <a href="index.html#inicio">Inicio</a>
-    <a href="catalogo.html">Catálogo</a>
-    <a href="catalogo.html?tipo=libros">Libros</a>
-    <a href="catalogo.html?tipo=velas">Velas</a>
-    <a href="index.html#nosotros">Nosotros</a>
-</nav>
+    <!-- =====================================
+         VENTANA DE REGISTRO
+    ====================================== -->
 
-    <div class="acciones"><button
-      type="button"
-      class="icono carrito-btn"
-      id="abrirCarrito"
-      aria-label="Ver carrito">🛒 <span
-      id="contador">0</span></button></div>
-  </header>
+    <div
+        id="modalRegistro"
+        class="ventana"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloRegistro">
 
-  <main>
-    <div class="catalogo-encabezado">
-      <span class="etiqueta">Nuestra colección</span>
-      <h1>Catálogo de Letras & Aromas</h1>
-      <p>Encuentra historias para leer y aromas para acompañarlas.</p>
-      <a class="catalogo-volver"
-      href="index.html">← Volver al inicio</a>
-      <div class="catalogo-filtros" role="group" aria-label="Filtrar productos">
-        <button type="button" data-filtro="todos" aria-pressed="true">Todos</button>
-        <button type="button" data-filtro="libros" aria-pressed="false">Libros</button>
-        <button type="button" data-filtro="velas" aria-pressed="false">Velas</button>
-      </div>
-    </div>
-    <section id="libros"
-    class="productos-seccion catalogo-seccion">
-      <div class="titulo"><span>Nuestra colección</span><h2>Libros</h2><p>Historias para perderte, soñar y descubrir nuevos mundos.</p></div>
-      <div class="productos" id="productosLibros"></div>
-    </section>
-    <section id="velas"
-    class="productos-seccion velas catalogo-seccion">
-      <div class="titulo"><span>
-        Aromas especiales
+        <div class="ventana-contenido">
 
-      </span>
-      <h2>Velas</h2>
-      <p>
-        Aromas suaves para acompañar tus momentos favoritos.
-      </p>
-    </div>
-      <div class="productos" id="productosVelas"></div>
-    </section>
-  </main>
+            <button
+                type="button"
+                class="cerrar"
+                id="cerrarRegistro"
+                aria-label="Cerrar">
+                &times;
+            </button>
 
-  <footer><div><h2>Letras & Aromas</h2><p>Historias que iluminan</p></div><div><h3>Contacto</h3><p>contacto@letrasyaromas.com</p></div></footer>
-  <div
-  id="modalCarrito"
-  class="ventana"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="tituloCarrito"
-  hidden>
-    <div class="ventana-contenido carrito">
-      <button class="cerrar"
-      id="cerrarCarrito"
-      type="button"
-      aria-label="Cerrar carrito">×</button>
-      <h2
-      id="tituloCarrito">
-      🛒 Mi carrito
-    </h2>
-      <div
-      id="listaCarrito">
-      <p>
-        Tu carrito está vacío
-      </p>
+            <h2 id="tituloRegistro">
+                Crear cuenta
+            </h2>
+
+            <p>
+                Registro de demostración.
+                No utilices contraseñas reales.
+            </p>
+
+            <form id="formularioRegistro">
+
+                <label for="registroNombre">
+                    Nombre
+                </label>
+
+                <input
+                    type="text"
+                    id="registroNombre"
+                    placeholder="Tu nombre"
+                    autocomplete="name"
+                    required>
+
+                <label for="registroEmail">
+                    Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="registroEmail"
+                    placeholder="Tu correo electrónico"
+                    autocomplete="email"
+                    required>
+
+                <label for="registroPassword">
+                    Contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="registroPassword"
+                    placeholder="Tu contraseña"
+                    autocomplete="new-password"
+                    required>
+
+                <button
+                    type="submit"
+                    class="boton-cuenta">
+                    Crear cuenta
+                </button>
+
+            </form>
+
+            <p class="cambiar-formulario">
+
+                ¿Ya tienes cuenta?
+
+                <button
+                    type="button"
+                    id="irLogin">
+                    Iniciar sesión
+                </button>
+
+            </p>
+
+        </div>
+
     </div>
-      <div class="total"><span>Total:</span><strong id="totalCarrito">$0.00</strong></div>
-      <p>Este carrito es una demostración. Todavía no procesa pedidos ni pagos.</p>
+
+    <!-- =====================================
+         CARRITO
+    ====================================== -->
+
+    <div
+        id="modalCarrito"
+        class="ventana"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloCarrito">
+
+        <div class="ventana-contenido carrito">
+
+            <button
+                type="button"
+                class="cerrar"
+                id="cerrarCarrito"
+                aria-label="Cerrar carrito">
+                &times;
+            </button>
+
+            <h2 id="tituloCarrito">
+                Mi carrito
+            </h2>
+
+            <div id="listaCarrito">
+                <p>Tu carrito está vacío.</p>
+            </div>
+
+            <div class="total">
+
+                <span>Total:</span>
+
+                <strong id="totalCarrito">
+                    $0.00
+                </strong>
+
+            </div>
+
+            <p class="carrito-aviso">
+                Los pedidos y pagos en línea
+                todavía no están habilitados.
+            </p>
+
+        </div>
+
     </div>
-  </div>
-  <div id="mensaje" class="mensaje" role="status" aria-live="polite" hidden></div>
-  <script src="catalogo.js"></script>
+
+    <!-- =====================================
+         MENSAJES
+    ====================================== -->
+
+    <div
+        id="mensaje"
+        class="mensaje"
+        role="status"
+        aria-live="polite">
+    </div>
+
+    <!-- =====================================
+         JAVASCRIPT
+    ====================================== -->
+
+    <script src="catalogo.js"></script>
+
 </body>
 </html>

@@ -1,533 +1,832 @@
 
-/* =================================
-   LETRAS & AROMAS
-   SCRIPT PRINCIPAL UNIFICADO
-================================= */
+/* ==========================================
+   LETRAS & AROMAS - SCRIPT DE INICIO
+   Productos, carrito y ventanas
+========================================== */
 
 let carrito = [];
 let productosServidor = [];
+let cuentaTemporal = null;
+let temporizadorMensaje = null;
 
-/* =================================
+function formatoPrecio(valor) {
+    return "$" + Number(valor).toFixed(2);
+}
+
+function normalizarTexto(valor) {
+    return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+}
+
+function rutaImagen(nombre) {
+    let ruta = String(nombre || "")
+        .trim()
+        .replace(/\\/g, "/");
+
+    if (!ruta) return "";
+
+    if (/^https:\/\//i.test(ruta)) {
+        return ruta;
+    }
+
+    if (/^[a-z]+:\/\//i.test(ruta)) {
+        return "";
+    }
+
+    ruta = ruta
+        .replace(/^\/?public\//i, "")
+        .replace(/^\/+/, "");
+
+    if (ruta.includes("..")) {
+        return "";
+    }
+
+    if (
+        ruta.toLowerCase().startsWith(
+            "carpeta de imagenes/"
+        )
+    ) {
+        return ruta;
+    }
+
+    return "carpeta de imagenes/" + ruta;
+}
+
+/* ==========================================
+   NOVEDADES - DOS LIBROS Y DOS VELAS
+========================================== */
+
+function seleccionarNovedades(productos) {
+    const seleccion = [
+        {
+            tipo: "libros",
+            nombre: "Mi planta de Naranja-Lima",
+            clave: "naranja lima",
+            clase: "libro1"
+        },
+        {
+            tipo: "libros",
+            nombre: "La Odisea",
+            clave: "odisea",
+            clase: "libro2"
+        },
+        {
+            tipo: "velas",
+            nombre: "Vela de limón",
+            clave: "limon",
+            clase: "vela-vainilla"
+        },
+        {
+            tipo: "velas",
+            nombre: "Vela de chocolate",
+            clave: "chocolate",
+            clase: "vela-chocolate"
+        }
+    ];
+
+    return seleccion.map(item => {
+        const producto = productos.find(p => {
+            const tipo = normalizarTexto(p.tipo);
+            const nombre = normalizarTexto(p.nombre);
+
+            if (tipo !== item.tipo) {
+                return false;
+            }
+
+            if (item.clave === "naranja lima") {
+                return nombre.includes("naranja") &&
+                       nombre.includes("lima");
+            }
+
+            return nombre.includes(item.clave);
+        });
+
+        return {
+            ...item,
+            producto
+        };
+    });
+}
+
+async function cargarProductos() {
+    const contenedor =
+        document.getElementById("productosNuevos");
+
+    if (!contenedor) return;
+
+    try {
+        const respuesta = await fetch("/api/productos");
+
+        if (!respuesta.ok) {
+            throw new Error(
+                "No se pudo consultar MongoDB"
+            );
+        }
+
+        const datos = await respuesta.json();
+
+        if (!Array.isArray(datos)) {
+            throw new Error(
+                "Respuesta de productos incorrecta"
+            );
+        }
+
+        const elegidos = seleccionarNovedades(datos);
+
+        productosServidor = elegidos
+            .filter(item => item.producto)
+            .map(item => item.producto);
+
+        contenedor.replaceChildren();
+
+        for (const item of elegidos) {
+            if (!item.producto) {
+                continue;
+            }
+
+            const producto = item.producto;
+
+            const tarjeta =
+                document.createElement("article");
+
+            tarjeta.className = "producto";
+
+            /* Imagen del producto */
+
+            const areaImagen =
+                document.createElement("div");
+
+            areaImagen.className =
+                "producto-imagen " + item.clase;
+
+            function mostrarSinImagen() {
+                areaImagen.replaceChildren();
+
+                const aviso =
+                    document.createElement("span");
+
+                aviso.textContent =
+                    "Imagen no disponible";
+
+                aviso.style.fontSize = "13px";
+
+                areaImagen.appendChild(aviso);
+            }
+
+            const origen = rutaImagen(producto.imagen);
+
+            if (origen) {
+                const imagen =
+                    document.createElement("img");
+
+                imagen.src = origen;
+                imagen.alt = producto.nombre;
+                imagen.loading = "lazy";
+
+                imagen.addEventListener(
+                    "error",
+                    mostrarSinImagen
+                );
+
+                areaImagen.appendChild(imagen);
+            } else {
+                mostrarSinImagen();
+            }
+
+            /* Información del producto */
+
+            const info =
+                document.createElement("div");
+
+            info.className = "producto-info";
+
+            const categoria =
+                document.createElement("span");
+
+            categoria.className = "categoria";
+            categoria.textContent =
+                producto.categoria || item.tipo;
+
+            const titulo =
+                document.createElement("h3");
+
+            titulo.textContent =
+                producto.nombre || item.nombre;
+
+            const descripcion =
+                document.createElement("p");
+
+            descripcion.textContent =
+                producto.descripcion || "";
+
+            /* Precio y botón */
+
+            const pie =
+                document.createElement("div");
+
+            pie.className = "producto-abajo";
+
+            const precio =
+                document.createElement("strong");
+
+            precio.textContent =
+                formatoPrecio(producto.precio);
+
+            const boton =
+                document.createElement("button");
+
+            boton.type = "button";
+
+            const stock =
+                Number(producto.stock || 0);
+
+            const disponible =
+                stock > 0 &&
+                Number.isFinite(
+                    Number(producto.precio)
+                );
+
+            boton.textContent = disponible
+                ? "Agregar al carrito"
+                : "Agotado";
+
+            boton.disabled = !disponible;
+
+            if (disponible) {
+                boton.addEventListener(
+                    "click",
+                    () => agregarDelServidor(producto)
+                );
+            }
+
+            pie.append(precio, boton);
+
+            info.append(
+                categoria,
+                titulo,
+                descripcion,
+                pie
+            );
+
+            tarjeta.append(areaImagen, info);
+
+            contenedor.appendChild(tarjeta);
+        }
+
+        /* Avisar si falta alguno de los cuatro */
+
+        const faltantes = elegidos
+            .filter(item => !item.producto)
+            .map(item => item.nombre);
+
+        if (faltantes.length) {
+            const aviso =
+                document.createElement("p");
+
+            aviso.className = "cargando-productos";
+
+            aviso.textContent =
+                "Aún no aparecen en MongoDB: " +
+                faltantes.join(", ") + ".";
+
+            contenedor.appendChild(aviso);
+        }
+
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las novedades:",
+            error
+        );
+
+        contenedor.replaceChildren();
+
+        const aviso =
+            document.createElement("p");
+
+        aviso.className = "cargando-productos";
+
+        aviso.textContent =
+            "No se pudieron cargar las novedades. " +
+            "Actualiza la página.";
+
+        contenedor.appendChild(aviso);
+    }
+}
+
+function agregarDelServidor(producto) {
+    if (!producto) return;
+
+    agregarCarrito(
+        producto.nombre,
+        producto.precio,
+        producto._id,
+        producto.stock
+    );
+}
+
+/* ==========================================
    CARRITO DE COMPRAS
-================================= */
+========================================== */
 
-// Agregar producto al carrito
-function agregarCarrito(nombre, precio) {
+function agregarCarrito(
+    nombre,
+    precio,
+    id = null,
+    stock = null
+) {
+    const valor = Number(precio);
+
+    if (
+        !Number.isFinite(valor) ||
+        valor < 0
+    ) {
+        mostrarMensaje(
+            "Este producto no tiene un precio válido."
+        );
+
+        return;
+    }
+
+    if (
+        stock !== null &&
+        stock !== undefined
+    ) {
+        const enCarrito = carrito.filter(
+            producto =>
+                producto.id === id &&
+                id !== null
+        ).length;
+
+        if (enCarrito >= Number(stock)) {
+            mostrarMensaje(
+                "No quedan más unidades disponibles."
+            );
+
+            return;
+        }
+    }
+
     carrito.push({
-        nombre: nombre,
-        precio: Number(precio)
+        nombre: String(nombre),
+        precio: valor,
+        id
     });
 
     actualizarCarrito();
-    mostrarMensaje("🛒 " + nombre + " agregado al carrito");
+
+    mostrarMensaje(
+        nombre + " se agregó al carrito."
+    );
 }
 
-// Actualizar productos y total del carrito
 function actualizarCarrito() {
-    const contador = document.getElementById("contador");
-    const lista = document.getElementById("listaCarrito");
-    const total = document.getElementById("totalCarrito");
+    const contador =
+        document.getElementById("contador");
 
-    // Evitar errores si no existe el carrito en la página
+    const lista =
+        document.getElementById("listaCarrito");
+
+    const total =
+        document.getElementById("totalCarrito");
+
     if (!contador || !lista || !total) {
         return;
     }
 
     contador.textContent = carrito.length;
-    lista.innerHTML = "";
+
+    lista.replaceChildren();
 
     if (carrito.length === 0) {
-        const aviso = document.createElement("p");
-        aviso.textContent = "Tu carrito está vacío";
-        lista.appendChild(aviso);
+        const vacio =
+            document.createElement("p");
 
-        total.textContent = "$0.00";
-        return;
+        vacio.textContent =
+            "Tu carrito está vacío.";
+
+        lista.appendChild(vacio);
     }
 
-    let suma = 0;
-
     carrito.forEach((producto, index) => {
-        suma += producto.precio;
+        const fila =
+            document.createElement("div");
 
-        const item = document.createElement("div");
-        item.classList.add("item-carrito");
+        fila.className = "item-carrito";
 
-        const informacion = document.createElement("div");
+        const datos =
+            document.createElement("div");
 
-        const nombreProducto = document.createElement("strong");
-        nombreProducto.textContent = producto.nombre;
+        const nombre =
+            document.createElement("strong");
 
-        const salto = document.createElement("br");
+        nombre.textContent = producto.nombre;
 
-        const precioProducto = document.createElement("small");
-        precioProducto.textContent =
-            "$" + producto.precio.toFixed(2);
+        const precio =
+            document.createElement("small");
 
-        informacion.appendChild(nombreProducto);
-        informacion.appendChild(salto);
-        informacion.appendChild(precioProducto);
+        precio.textContent =
+            formatoPrecio(producto.precio);
 
-        const botonEliminar = document.createElement("button");
-        botonEliminar.textContent = "×";
-        botonEliminar.type = "button";
+        datos.append(nombre, precio);
 
-        botonEliminar.addEventListener("click", () => {
-            eliminarProducto(index);
-        });
+        const eliminar =
+            document.createElement("button");
 
-        item.appendChild(informacion);
-        item.appendChild(botonEliminar);
+        eliminar.type = "button";
+        eliminar.textContent = "×";
 
-        lista.appendChild(item);
+        eliminar.setAttribute(
+            "aria-label",
+            "Eliminar " + producto.nombre
+        );
+
+        eliminar.addEventListener(
+            "click",
+            () => eliminarProducto(index)
+        );
+
+        fila.append(datos, eliminar);
+
+        lista.appendChild(fila);
     });
 
-    total.textContent = "$" + suma.toFixed(2);
+    total.textContent = formatoPrecio(
+        carrito.reduce(
+            (suma, producto) =>
+                suma + producto.precio,
+            0
+        )
+    );
 }
 
-// Eliminar producto del carrito
 function eliminarProducto(index) {
-    if (index < 0 || index >= carrito.length) {
+    if (
+        index < 0 ||
+        index >= carrito.length
+    ) {
         return;
     }
 
     carrito.splice(index, 1);
 
     actualizarCarrito();
-    mostrarMensaje("Producto eliminado 🗑️");
-}
-
-// Abrir carrito
-function mostrarCarrito() {
-    const modal = document.getElementById("modalCarrito");
-
-    if (modal) {
-        modal.classList.add("activa");
-    }
-}
-
-// Cerrar carrito
-function cerrarCarrito() {
-    const modal = document.getElementById("modalCarrito");
-
-    if (modal) {
-        modal.classList.remove("activa");
-    }
-}
-
-// Simulación de compra
-function comprar() {
-    if (carrito.length === 0) {
-        mostrarMensaje("Tu carrito está vacío");
-        return;
-    }
 
     mostrarMensaje(
-        "Compra de demostración. Aún no se ha realizado un pedido real."
-    );
-
-    carrito = [];
-
-    actualizarCarrito();
-    cerrarCarrito();
-}
-
-/* =================================
-   PRODUCTOS DESDE MONGODB
-================================= */
-
-// Consultar productos del servidor y mostrarlos en la página
-async function cargarProductos() {
-    const contenedor = document.getElementById("productosNuevos");
-
-    // Si el contenedor no existe, no hacemos nada
-    if (!contenedor) {
-        return;
-    }
-
-    try {
-        const respuesta = await fetch("/api/productos");
-
-        if (!respuesta.ok) {
-            throw new Error("Error al consultar los productos");
-        }
-
-        const datos = await respuesta.json();
-
-        if (!Array.isArray(datos)) {
-            throw new Error("Formato de productos incorrecto");
-        }
-
-        productosServidor = datos;
-
-    } catch (error) {
-        console.error("Error al cargar productos:", error);
-
-        contenedor.innerHTML =
-            "<p>No se pudieron cargar los productos.</p>";
-
-        return;
-    }
-
-    // Si no existen productos
-    if (productosServidor.length === 0) {
-        contenedor.innerHTML =
-            "<p>Pronto habrá productos nuevos.</p>";
-
-        return;
-    }
-
-    contenedor.innerHTML = "";
-
-    // Crear tarjetas de productos
-    productosServidor.forEach((producto, index) => {
-
-        const tarjeta = document.createElement("article");
-        tarjeta.classList.add("producto");
-
-        // Imagen
-        const contenedorImagen = document.createElement("div");
-        contenedorImagen.classList.add("producto-imagen");
-
-        if (producto.imagen) {
-            const imagen = document.createElement("img");
-
-            imagen.src = "carpeta de imagenes/" + producto.imagen;
-            imagen.alt = producto.nombre || "Producto";
-
-            contenedorImagen.appendChild(imagen);
-        }
-
-        tarjeta.appendChild(contenedorImagen);
-
-        // Información
-        const informacion = document.createElement("div");
-        informacion.classList.add("producto-info");
-
-        const categoria = document.createElement("span");
-        categoria.classList.add("categoria");
-        categoria.textContent =
-            String(producto.categoria || "").toUpperCase();
-
-        const nombre = document.createElement("h3");
-        nombre.textContent = producto.nombre || "Sin nombre";
-
-        const descripcion = document.createElement("p");
-        descripcion.textContent = producto.descripcion || "";
-
-        informacion.appendChild(categoria);
-        informacion.appendChild(nombre);
-        informacion.appendChild(descripcion);
-
-        // Precio y botón
-        const parteInferior = document.createElement("div");
-        parteInferior.classList.add("producto-abajo");
-
-        const precio = document.createElement("strong");
-
-        precio.textContent =
-            "$" + Number(producto.precio || 0).toFixed(2);
-
-        const boton = document.createElement("button");
-        boton.type = "button";
-        boton.textContent = "Agregar 🛒";
-
-        boton.addEventListener("click", () => {
-            agregarDelServidor(index);
-        });
-
-        parteInferior.appendChild(precio);
-        parteInferior.appendChild(boton);
-
-        informacion.appendChild(parteInferior);
-        tarjeta.appendChild(informacion);
-
-        contenedor.appendChild(tarjeta);
-    });
-}
-
-// Agregar un producto del servidor al carrito
-function agregarDelServidor(index) {
-    const producto = productosServidor[index];
-
-    if (!producto) {
-        mostrarMensaje("No se encontró el producto");
-        return;
-    }
-
-    agregarCarrito(
-        producto.nombre,
-        Number(producto.precio)
+        "Producto eliminado del carrito."
     );
 }
 
-/* =================================
-   LOGIN
-================================= */
+function mostrarCarrito() {
+    document
+        .getElementById("modalCarrito")
+        ?.classList.add("activa");
+}
+
+function cerrarCarrito() {
+    document
+        .getElementById("modalCarrito")
+        ?.classList.remove("activa");
+}
+
+/* ==========================================
+   SOLICITUD DE PEDIDO POR CORREO
+========================================== */
+
+function comprar() {
+    if (!carrito.length) {
+        mostrarMensaje(
+            "Agrega un producto antes de continuar."
+        );
+
+        return;
+    }
+
+    const detalle = carrito.map(
+        producto =>
+            "- " +
+            producto.nombre +
+            ": " +
+            formatoPrecio(producto.precio)
+    );
+
+    const total = carrito.reduce(
+        (suma, producto) =>
+            suma + producto.precio,
+        0
+    );
+
+    const asunto = encodeURIComponent(
+        "Consulta de pedido - Letras & Aromas"
+    );
+
+    const cuerpo = encodeURIComponent(
+        "Hola, quisiera consultar la disponibilidad " +
+        "de estos productos:\n\n" +
+        detalle.join("\n") +
+        "\n\nTotal estimado: " +
+        formatoPrecio(total) +
+        "\n\nPor favor, confírmenme el precio final " +
+        "y las opciones de entrega."
+    );
+
+    window.location.href =
+        "mailto:aromasletras@gmail.com" +
+        "?subject=" + asunto +
+        "&body=" + cuerpo;
+
+    mostrarMensaje(
+        "Se abrirá tu correo para consultar el pedido. " +
+        "Aún no se ha enviado ni cobrado."
+    );
+}
+
+/* ==========================================
+   INICIO DE SESIÓN Y REGISTRO
+   FUNCIONES TEMPORALES
+========================================== */
 
 function abrirLogin() {
     cerrarRegistro();
 
-    const modal = document.getElementById("modalLogin");
-
-    if (modal) {
-        modal.classList.add("activa");
-    }
+    document
+        .getElementById("modalLogin")
+        ?.classList.add("activa");
 }
 
 function cerrarLogin() {
-    const modal = document.getElementById("modalLogin");
-
-    if (modal) {
-        modal.classList.remove("activa");
-    }
+    document
+        .getElementById("modalLogin")
+        ?.classList.remove("activa");
 }
-
-/* =================================
-   REGISTRO DE USUARIOS
-   SOLO PARA DEMOSTRACIÓN
-================================= */
 
 function abrirRegistro() {
     cerrarLogin();
 
-    const modal = document.getElementById("modalRegistro");
-
-    if (modal) {
-        modal.classList.add("activa");
-    }
+    document
+        .getElementById("modalRegistro")
+        ?.classList.add("activa");
 }
 
 function cerrarRegistro() {
-    const modal = document.getElementById("modalRegistro");
-
-    if (modal) {
-        modal.classList.remove("activa");
-    }
+    document
+        .getElementById("modalRegistro")
+        ?.classList.remove("activa");
 }
 
-// Registro de demostración
 function registrarse(event) {
     event.preventDefault();
 
     const nombre = document
-        .getElementById("registroNombre").value.trim();
+        .getElementById("registroNombre")
+        ?.value.trim();
 
     const email = document
-        .getElementById("registroEmail").value.trim();
+        .getElementById("registroEmail")
+        ?.value.trim();
 
-    const password = document
-        .getElementById("registroPassword").value;
+    const clave = document
+        .getElementById("registroPassword")
+        ?.value;
 
-    if (!nombre || !email || !password) {
-        mostrarMensaje("Completa todos los campos");
+    if (!nombre || !email || !clave) {
+        mostrarMensaje(
+            "Completa todos los campos."
+        );
+
         return;
     }
 
-    // Esta función es solo una demostración local.
-    // No debe utilizarse con contraseñas reales.
+    // Cuenta temporal, solo para demostración.
+    // Se elimina al recargar la página.
+    // No debe utilizarse con datos reales.
 
-    const usuario = {
-        nombre: nombre,
-        email: email,
-        password: password
+    cuentaTemporal = {
+        nombre,
+        email,
+        clave
     };
 
-    localStorage.setItem(
-        "usuarioLetrasAromas",
-        JSON.stringify(usuario)
-    );
+    document
+        .querySelector("#modalRegistro form")
+        ?.reset();
 
     cerrarRegistro();
 
     mostrarMensaje(
-        "¡Cuenta de demostración creada correctamente!"
+        "Cuenta de prueba creada para esta sesión. " +
+        "No uses datos reales."
     );
-
-    document.getElementById("registroNombre").value = "";
-    document.getElementById("registroEmail").value = "";
-    document.getElementById("registroPassword").value = "";
 }
-
-/* =================================
-   INICIAR SESIÓN
-   SOLO PARA DEMOSTRACIÓN
-================================= */
 
 function iniciarSesion(event) {
     event.preventDefault();
 
     const email = document
-        .getElementById("loginEmail").value;
+        .getElementById("loginEmail")
+        ?.value.trim();
 
-    const password = document
-        .getElementById("loginPassword").value;
+    const clave = document
+        .getElementById("loginPassword")
+        ?.value;
 
-    const datos = localStorage.getItem("usuarioLetrasAromas");
+    if (!cuentaTemporal) {
+        mostrarMensaje(
+            "Crea primero una cuenta de prueba. " +
+            "Se borra al actualizar la página."
+        );
 
-    if (!datos) {
-        mostrarMensaje("Primero debes crear una cuenta 🌸");
-        return;
-    }
-
-    let usuario;
-
-    try {
-        usuario = JSON.parse(datos);
-    } catch (error) {
-        mostrarMensaje("No se pudieron leer los datos de la cuenta");
         return;
     }
 
     if (
-        email === usuario.email &&
-        password === usuario.password
+        email === cuentaTemporal.email &&
+        clave === cuentaTemporal.clave
     ) {
         cerrarLogin();
 
         mostrarMensaje(
-            "¡Bienvenido/a, " + usuario.nombre + "!"
+            "Bienvenido/a, " +
+            cuentaTemporal.nombre + "."
         );
+
     } else {
-        mostrarMensaje("Correo o contraseña incorrectos");
+        mostrarMensaje(
+            "Correo o contraseña incorrectos."
+        );
     }
 }
 
-/* =================================
+/* ==========================================
    NEWSLETTER
-================================= */
+========================================== */
 
 function suscribirse(event) {
     event.preventDefault();
 
-    const campo = document.getElementById("correoNewsletter");
-
-    if (!campo) {
-        return;
-    }
-
-    const correo = campo.value.trim();
-
-    if (correo) {
-        // Confirmación visual: aún no guarda suscriptores.
-        mostrarMensaje(
-            "Suscripción de demostración registrada en pantalla"
-        );
-
-        campo.value = "";
-    }
+    mostrarMensaje(
+        "La suscripción por correo aún no está habilitada."
+    );
 }
 
-/* =================================
+/* ==========================================
    MENSAJES EMERGENTES
-================================= */
+========================================== */
 
 function mostrarMensaje(texto) {
-    const mensaje = document.getElementById("mensaje");
+    const caja =
+        document.getElementById("mensaje");
 
-    if (!mensaje) {
-        console.log(texto);
+    if (!caja) {
+        console.info(texto);
         return;
     }
 
-    mensaje.textContent = texto;
-    mensaje.classList.add("mostrar");
+    caja.textContent = texto;
+    caja.classList.add("mostrar");
 
-    setTimeout(() => {
-        mensaje.classList.remove("mostrar");
-    }, 3000);
+    clearTimeout(temporizadorMensaje);
+
+    temporizadorMensaje = setTimeout(
+        () => caja.classList.remove("mostrar"),
+        3500
+    );
 }
 
-/* =================================
-   CERRAR MODALES HACIENDO CLIC AFUERA
-================================= */
+/* ==========================================
+   CERRAR VENTANAS
+========================================== */
 
-window.addEventListener("click", function (event) {
+window.addEventListener(
+    "click",
+    event => {
+        if (
+            event.target ===
+            document.getElementById("modalLogin")
+        ) {
+            cerrarLogin();
+        }
 
-    const login = document.getElementById("modalLogin");
-    const registro = document.getElementById("modalRegistro");
-    const carritoModal = document.getElementById("modalCarrito");
+        if (
+            event.target ===
+            document.getElementById("modalRegistro")
+        ) {
+            cerrarRegistro();
+        }
 
-    if (login && event.target === login) {
-        cerrarLogin();
+        if (
+            event.target ===
+            document.getElementById("modalCarrito")
+        ) {
+            cerrarCarrito();
+        }
     }
+);
 
-    if (registro && event.target === registro) {
-        cerrarRegistro();
+window.addEventListener(
+    "keydown",
+    event => {
+        if (event.key === "Escape") {
+            cerrarLogin();
+            cerrarRegistro();
+            cerrarCarrito();
+        }
     }
+);
 
-    if (carritoModal && event.target === carritoModal) {
-        cerrarCarrito();
-    }
-});
-
-/* =================================
+/* ==========================================
    FORMULARIO DE CONTACTO
-   CONECTADO CON MONGODB
-================================= */
+   PARA LA PÁGINA NOSOTROS
+========================================== */
 
 function configurarFormularioContacto() {
-
-    const formularioContacto =
+    const formulario =
         document.getElementById("formularioContacto");
 
-    if (!formularioContacto) {
+    if (!formulario) {
         return;
     }
 
-    formularioContacto.addEventListener(
+    formulario.addEventListener(
         "submit",
-        async function (event) {
-
+        async event => {
             event.preventDefault();
 
-            const respuestaContacto =
-                document.getElementById("respuestaContacto");
+            const estado =
+                document.getElementById(
+                    "respuestaContacto"
+                );
 
-            const botonEnviar = formularioContacto.querySelector(
+            const boton = formulario.querySelector(
                 'button[type="submit"]'
             );
 
-            const datos = {
-                nombre: document
-                    .getElementById("nombreContacto")
-                    .value.trim(),
+            const campos = [
+                "nombre",
+                "email",
+                "asunto",
+                "mensaje"
+            ];
 
-                email: document
-                    .getElementById("emailContacto")
-                    .value.trim(),
+            const ids = [
+                "nombreContacto",
+                "emailContacto",
+                "asuntoContacto",
+                "mensajeContacto"
+            ];
 
-                asunto: document
-                    .getElementById("asuntoContacto")
-                    .value.trim(),
+            const datos = {};
 
-                mensaje: document
-                    .getElementById("mensajeContacto")
-                    .value.trim()
-            };
+            for (
+                let i = 0;
+                i < campos.length;
+                i++
+            ) {
+                const campo =
+                    document.getElementById(ids[i]);
 
-            if (botonEnviar) {
-                botonEnviar.disabled = true;
+                if (!campo) {
+                    if (estado) {
+                        estado.textContent =
+                            "Falta un campo del formulario.";
+                    }
+
+                    return;
+                }
+
+                datos[campos[i]] =
+                    campo.value.trim();
             }
 
-            if (respuestaContacto) {
-                respuestaContacto.textContent =
+            if (boton) {
+                boton.disabled = true;
+            }
+
+            if (estado) {
+                estado.textContent =
                     "Enviando mensaje...";
 
-                respuestaContacto.style.color = "";
+                estado.style.color = "";
             }
 
             try {
-                // Ruta de la API del mismo servidor web
-                const respuesta = await fetch("/api/contacto", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(datos)
-                });
+                const respuesta = await fetch(
+                    "/api/contacto",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body: JSON.stringify(datos)
+                    }
+                );
 
-                const resultado = await respuesta.json();
+                const resultado =
+                    await respuesta.json();
 
                 if (!respuesta.ok) {
                     throw new Error(
@@ -536,56 +835,48 @@ function configurarFormularioContacto() {
                     );
                 }
 
-                if (respuestaContacto) {
-                    respuestaContacto.textContent =
+                if (estado) {
+                    estado.textContent =
                         resultado.mensaje;
 
-                    respuestaContacto.style.color = "green";
+                    estado.style.color = "green";
                 }
 
-                formularioContacto.reset();
+                formulario.reset();
 
             } catch (error) {
-
                 console.error(
-                    "Error al enviar el formulario:",
+                    "Error al enviar contacto:",
                     error
                 );
 
-                if (respuestaContacto) {
-                    respuestaContacto.textContent =
-                        "No se pudo enviar el mensaje. Inténtalo nuevamente.";
+                if (estado) {
+                    estado.textContent =
+                        "No se pudo enviar el mensaje. " +
+                        "Inténtalo de nuevo.";
 
-                    respuestaContacto.style.color = "red";
+                    estado.style.color = "#b3261e";
                 }
 
             } finally {
-
-                if (botonEnviar) {
-                    botonEnviar.disabled = false;
+                if (boton) {
+                    boton.disabled = false;
                 }
             }
         }
     );
 }
 
-/* =================================
-   INICIAR FUNCIONES DE LA PÁGINA
-================================= */
+/* ==========================================
+   INICIALIZACIÓN
+========================================== */
 
 function iniciarPagina() {
-
-    // Actualizar carrito
     actualizarCarrito();
-
-    // Cargar productos desde MongoDB
     cargarProductos();
-
-    // Activar formulario de contacto
     configurarFormularioContacto();
 }
 
-// Esperar a que la página esté lista
 if (document.readyState === "loading") {
     document.addEventListener(
         "DOMContentLoaded",
