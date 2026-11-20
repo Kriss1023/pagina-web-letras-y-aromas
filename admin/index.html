@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,55 +11,86 @@
             margin: 0;
             background: #f4f1ec;
         }
+
         header {
             background: #4a2f1b;
             color: white;
             padding: 15px;
         }
+
         main {
             max-width: 900px;
             margin: 20px auto;
             padding: 0 15px;
         }
+
         .caja {
             background: white;
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 8px;
         }
+
         label {
             display: block;
             margin-bottom: 10px;
         }
-        input, textarea {
+
+        input,
+        textarea {
             width: 100%;
             padding: 8px;
             margin-top: 4px;
             box-sizing: border-box;
         }
+
         button {
             padding: 8px 14px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
-        .guardar { background: #4a2f1b; color: white; }
-        .editar { background: #ddd; }
-        .borrar { background: #b3261e; color: white; }
+
+        .guardar {
+            background: #4a2f1b;
+            color: white;
+        }
+
+        .editar {
+            background: #ddd;
+        }
+
+        .borrar {
+            background: #b3261e;
+            color: white;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        th, td {
+
+        th,
+        td {
             text-align: left;
             padding: 8px;
             border-bottom: 1px solid #ddd;
         }
-        #mensaje { margin-bottom: 10px; }
-        .ok { color: green; }
-        .error { color: red; }
+
+        #mensaje {
+            margin-bottom: 10px;
+        }
+
+        .ok {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Panel de administración - Letras y Aromas</h1>
@@ -75,7 +107,13 @@
                 <label>Nombre
                     <input type="text" id="nombre" required>
                 </label>
-
+                <label>Tipo de producto
+                    <select id="tipo" required>
+                        <option value="">Seleccionar tipo</option>
+                        <option value="libros">Libro</option>
+                        <option value="velas">Vela</option>
+                    </select>
+                </label>
                 <label>Categoría
                     <input type="text" id="categoria" placeholder="Libros, Café, Velas...">
                 </label>
@@ -193,7 +231,7 @@
 
             document.getElementById("id").value = p.id;
             document.getElementById("nombre").value = p.nombre;
-            document.getElementById("categoria").value = p.categoria;
+            document.getElementById("categoria").value = p.categoria || "";
             document.getElementById("precio").value = p.precio;
             document.getElementById("stock").value = p.stock;
             document.getElementById("imagen").value = p.imagen;
@@ -243,6 +281,7 @@
             // Datos que se envían al servidor
             var datos = {
                 nombre: document.getElementById("nombre").value,
+                tipo: document.getElementById("tipo").value,
                 categoria: document.getElementById("categoria").value,
                 precio: Number(document.getElementById("precio").value),
                 stock: Number(document.getElementById("stock").value),
@@ -289,4 +328,5 @@
         cargarProductos();
     </script>
 </body>
+
 </html>

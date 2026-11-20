@@ -1,156 +1,305 @@
+
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
-const { DatabaseSync } = require("node:sqlite");
+const mongoose = require("mongoose");
+
+const Producto = require("./models/producto.js");
+const Contacto = require("./models/contacto.js");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Usuario y clave para entrar al admin (cámbialos)
-const ADMIN_USER = process.env.ADMIN_USER || "Kris";
-const ADMIN_PASS = process.env.ADMIN_PASS || "1234";
-console.log("Usuario del admin:", ADMIN_USER);
-console.log("Largo de la clave:", ADMIN_PASS.length);
-// ---------- Base de datos ----------
-// Se guarda en el archivo tienda.db
-const db = new DatabaseSync(path.join(__dirname, "tienda.db"));
+// Configuración general
+app.use(express.json({ limit: "10kb" }));
 
-// Crea la tabla si todavía no existe
-db.exec(`
-    CREATE TABLE IF NOT EXISTS productos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        descripcion TEXT NOT NULL DEFAULT '',
-        precio REAL NOT NULL DEFAULT 0,
-        categoria TEXT NOT NULL DEFAULT '',
-        imagen TEXT NOT NULL DEFAULT '',
-        stock INTEGER NOT NULL DEFAULT 0
-    )
-`);
+// Suscripciones de la comunidad
+app.use(
+    "/api/suscripciones",
+    require("./routes/suscripciones.js")
+);
 
-// ---------- Protección del admin ----------
-// Pide usuario y clave antes de entrar a /admin
+// Direcciones permitidas
+const origenesPermitidos = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+];
+
+app.use((req, res, next) => {
+    const origen = req.headers.origin;
+
+    if (origenesPermitidos.includes(origen)) {
+        res.setHeader("Access-Control-Allow-Origin", origen);
+        res.setHeader("Vary", "Origin");
+    }
+
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS"
+    );
+
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization"
+    );
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+
+    next();
+});
+
+// Protección del administrador
 function protegerAdmin(req, res, next) {
-    var header = req.headers.authorization || "";
-    var partes = header.split(" ");
+    const usuarioConfigurado = process.env.ADMIN_USER;
+    const claveConfigurada = process.env.ADMIN_PASS;
+
+    if (!usuarioConfigurado || !claveConfigurada) {
+        return res.status(503).send(
+            "Panel administrativo sin configurar"
+        );
+    }
+
+    const autorizacion = req.headers.authorization || "";
+    const partes = autorizacion.split(" ");
 
     if (partes[0] === "Basic" && partes[1]) {
-        var texto = Buffer.from(partes[1], "base64").toString();
-        var usuario = texto.split(":")[0];
-        var clave = texto.split(":").slice(1).join(":");
+        const credenciales = Buffer.from(
+            partes[1],
+            "base64"
+        ).toString("utf8");
 
-        if (usuario === ADMIN_USER && clave === ADMIN_PASS) {
+        const separador = credenciales.indexOf(":");
+
+        const usuario = credenciales.slice(0, separador);
+        const clave = credenciales.slice(separador + 1);
+
+        if (
+            separador !== -1 &&
+            usuario === usuarioConfigurado &&
+            clave === claveConfigurada
+        ) {
             return next();
         }
     }
 
-    res.set("WWW-Authenticate", 'Basic realm="Admin"');
-    res.status(401).send("Acceso restringido");
+    res.set(
+        "WWW-Authenticate",
+        'Basic realm="Administracion Letras y Aromas"'
+    );
+
+    return res.status(401).send("Acceso restringido");
 }
 
-// Revisa que los datos del formulario estén bien
-function revisarProducto(body) {
-    var nombre = String(body.nombre || "").trim();
-    var precio = Number(body.precio);
-    var stock = Number(body.stock);
+// Validar información de productos
 
-    if (nombre === "") {
+function revisarProducto(body) {
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return { error: "Datos de producto inválidos" };
+    }
+
+    const nombre = String(body.nombre || "").trim();
+    const tipo = String(body.tipo || "").trim().toLowerCase();
+    const categoria = String(body.categoria || "").trim();
+    const precio = Number(body.precio);
+    const stock = Number(body.stock);
+
+    if (!nombre) {
         return { error: "El nombre es obligatorio" };
     }
-    if (isNaN(precio) || precio < 0) {
+
+    if (!["libros", "velas"].includes(tipo)) {
+        return {
+            error: "Selecciona si el producto es un libro o una vela"
+        };
+    }
+
+    if (!categoria) {
+        return { error: "La categoría es obligatoria" };
+    }
+
+    if (!Number.isFinite(precio) || precio < 0) {
         return { error: "Precio inválido" };
     }
+
     if (!Number.isInteger(stock) || stock < 0) {
         return { error: "Stock inválido" };
     }
 
     return {
         datos: {
-            nombre: nombre,
-            descripcion: String(body.descripcion || "").trim(),
-            precio: precio,
-            categoria: String(body.categoria || "").trim(),
+            nombre,
+            tipo,
+            categoria,
+            precio,
+            stock,
             imagen: String(body.imagen || "").trim(),
-            stock: stock
+            descripcion: String(body.descripcion || "").trim()
         }
     };
 }
 
-// Para poder leer el JSON que envía el formulario
-app.use(express.json());
 
-// ---------- API pública (la usa la página principal) ----------
-// Solo muestra los productos que tienen stock
-app.get("/api/productos", function (req, res) {
-    var productos = db
-        .prepare("SELECT * FROM productos WHERE stock > 0 ORDER BY nombre")
-        .all();
-    res.json(productos);
+// API pública: productos
+app.get("/api/productos", async (req, res) => {
+    try {
+        const productos = await Producto.find().lean();
+        res.json(productos);
+    } catch (error) {
+        console.error("Error al consultar productos:", error.message);
+
+        res.status(500).json({
+            mensaje: "Error al obtener los productos"
+        });
+    }
 });
 
 // ---------- API del admin (con clave) ----------
-// Protección solo en las rutas de API, no en los archivos estáticos
-app.use("/admin/api", protegerAdmin);
+app.use("/admin", protegerAdmin);
 
-// Ver todos los productos
-app.get("/admin/api/productos", function (req, res) {
-    var productos = db.prepare("SELECT * FROM productos ORDER BY id DESC").all();
-    res.json(productos);
-});
+// Consultar productos desde el administrador
+app.get("/admin/api/productos", async (req, res) => {
+    try {
+        const productos = await Producto.find()
+            .sort({ createdAt: -1 })
+            .lean();
 
-// Agregar un producto
-app.post("/admin/api/productos", function (req, res) {
-    var resultado = revisarProducto(req.body);
-    if (resultado.error) {
-        return res.status(400).json({ error: resultado.error });
+        res.json(productos);
+    } catch (error) {
+        res.status(500).json({
+            error: "No se pudieron consultar los productos"
+        });
     }
-
-    var d = resultado.datos;
-    var info = db
-        .prepare(
-            "INSERT INTO productos (nombre, descripcion, precio, categoria, imagen, stock) VALUES (?, ?, ?, ?, ?, ?)"
-        )
-        .run(d.nombre, d.descripcion, d.precio, d.categoria, d.imagen, d.stock);
-
-    res.status(201).json({ id: Number(info.lastInsertRowid), ...d });
 });
 
-// Editar un producto
-app.put("/admin/api/productos/:id", function (req, res) {
-    var id = Number(req.params.id);
-    var resultado = revisarProducto(req.body);
-    if (resultado.error) {
-        return res.status(400).json({ error: resultado.error });
+// Crear producto
+app.post("/admin/api/productos", async (req, res) => {
+    try {
+        const resultado = revisarProducto(req.body);
+
+        if (resultado.error) {
+            return res.status(400).json({
+                error: resultado.error
+            });
+        }
+
+        const producto = await Producto.create(resultado.datos);
+
+        res.status(201).json(producto);
+    } catch (error) {
+        console.error("Error al crear producto:", error.message);
+
+        res.status(500).json({
+            error: "No se pudo crear el producto"
+        });
     }
+});
 
-    var d = resultado.datos;
-    var info = db
-        .prepare(
-            "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, categoria = ?, imagen = ?, stock = ? WHERE id = ?"
-        )
-        .run(d.nombre, d.descripcion, d.precio, d.categoria, d.imagen, d.stock, id);
+// Actualizar producto
+app.put("/admin/api/productos/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                error: "Identificador inválido"
+            });
+        }
 
-    if (info.changes === 0) {
-        return res.status(404).json({ error: "Producto no encontrado" });
+        const resultado = revisarProducto(req.body);
+
+        if (resultado.error) {
+            return res.status(400).json({
+                error: resultado.error
+            });
+        }
+
+        const producto = await Producto.findByIdAndUpdate(
+            req.params.id,
+            { $set: resultado.datos },
+            { new: true, runValidators: true }
+        );
+
+        if (!producto) {
+            return res.status(404).json({
+                error: "Producto no encontrado"
+            });
+        }
+
+        res.json(producto);
+    } catch (error) {
+        res.status(500).json({
+            error: "No se pudo actualizar el producto"
+        });
     }
-    res.json({ id: id, ...d });
 });
 
-// Borrar un producto
-app.delete("/admin/api/productos/:id", function (req, res) {
-    var id = Number(req.params.id);
-    var info = db.prepare("DELETE FROM productos WHERE id = ?").run(id);
+// Eliminar producto
+app.delete("/admin/api/productos/:id", async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                error: "Identificador inválido"
+            });
+        }
 
-    if (info.changes === 0) {
-        return res.status(404).json({ error: "Producto no encontrado" });
+        const producto = await Producto.findByIdAndDelete(
+            req.params.id
+        );
+
+        if (!producto) {
+            return res.status(404).json({
+                error: "Producto no encontrado"
+            });
+        }
+
+        res.json({ ok: true });
+    } catch (error) {
+        res.status(500).json({
+            error: "No se pudo eliminar el producto"
+        });
     }
-    res.json({ ok: true });
 });
 
-// ---------- Páginas ----------
-// La carpeta "admin" tiene el panel y la carpeta "public" la página principal
-app.use("/admin", express.static(path.join(__dirname, "admin")));
-app.use(express.static(path.join(__dirname, "public")));
+// Archivos de la página principal y del administrador
+app.use(
+    "/admin",
+    express.static(path.join(__dirname, "admin.html"))
+);
 
-app.listen(PORT, function () {
-    console.log("Servidor ejecutándose en http://localhost:" + PORT);
-});
+app.use(
+    express.static(path.join(__dirname, "public"))
+);
+
+// Iniciar MongoDB y el servidor
+async function iniciarServidor() {
+    try {
+        if (!process.env.MONGODB_URI) {
+            throw new Error(
+                "Falta MONGODB_URI en el archivo .env"
+            );
+        }
+
+        await mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 10000
+        });
+
+        console.log("MongoDB conectado correctamente");
+
+        app.listen(PORT, () => {
+            console.log(
+                `Servidor ejecutándose en el puerto ${PORT}`
+            );
+        });
+
+    } catch (error) {
+        console.error(
+            "Error al iniciar servidor:",
+            error.message
+        );
+
+        process.exitCode = 1;
+    }
+}
+
+iniciarServidor();
