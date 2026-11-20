@@ -88,7 +88,8 @@ app.get("/api/productos", function (req, res) {
 });
 
 // ---------- API del admin (con clave) ----------
-app.use("/admin", protegerAdmin);
+// Protección solo en las rutas de API, no en los archivos estáticos
+app.use("/admin/api", protegerAdmin);
 
 // Ver todos los productos
 app.get("/admin/api/productos", function (req, res) {

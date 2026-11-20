@@ -119,6 +119,11 @@
     </main>
 
     <script>
+        // Credenciales de admin para la autenticación Basic
+        var ADMIN_USER = "Kris";
+        var ADMIN_PASS = "1234";
+        var authHeader = "Basic " + btoa(ADMIN_USER + ":" + ADMIN_PASS);
+        
         // Ruta del servidor. Como el admin se abre desde el mismo servidor
         // (localhost:3000) no hace falta poner el puerto
         var API = "/admin/api/productos";
@@ -131,6 +136,18 @@
         // Aquí guardo la lista de productos que llega del servidor
         var productos = [];
 
+        // Función para hacer fetch con autorización Basic
+        function fetchConAuth(url, options = {}) {
+            return fetch(url, {
+                ...options,
+                headers: {
+                    "Authorization": authHeader,
+                    "Content-Type": "application/json",
+                    ...(options.headers || {})
+                }
+            });
+        }
+
         // Muestra un mensaje arriba del formulario
         function mostrarMensaje(texto, tipo) {
             mensaje.textContent = texto;
@@ -140,11 +157,11 @@
         // Pide los productos al servidor
         async function cargarProductos() {
             try {
-                var respuesta = await fetch(API);
+                var respuesta = await fetchConAuth(API);
                 productos = await respuesta.json();
                 mostrarTabla();
             } catch (error) {
-                mostrarMensaje("No se pudo conectar con el servidor. ¿Abriste esta página desde http://localhost:3000/admin/admin.html?", "error");
+                mostrarMensaje("No se pudo conectar con el servidor", "error");
             }
         }
 
@@ -204,7 +221,7 @@
             }
 
             try {
-                var respuesta = await fetch(API + "/" + p.id, { method: "DELETE" });
+                var respuesta = await fetchConAuth(API + "/" + p.id, { method: "DELETE" });
 
                 if (respuesta.ok) {
                     mostrarMensaje("Producto borrado", "ok");
@@ -242,7 +259,7 @@
             }
 
             try {
-                var respuesta = await fetch(url, {
+                var respuesta = await fetchConAuth(url, {
                     method: metodo,
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(datos)
