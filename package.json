@@ -1,34 +1,22 @@
-
 {
   "name": "pagina-web-letras-aromas",
   "version": "1.0.0",
-  "description": "Tienda virtual de Letras y Aromas",
-  "main": "server.js",
+  "description": "Tienda virtual de Letras y Aromas - React + Vite",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
-    "test": "echo \"No hay pruebas configuradas\""
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Kriss1023/pagina-web-letras-y-aromas.git"
-  },
-  "keywords": [
-    "Libros",
-    "Velas",
-    "Aromas",
-    "Tienda virtual"
-  ],
-  "author": "Kristel Torres, Isaac Arévalo",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Kriss1023/pagina-web-letras-y-aromas/issues"
-  },
-  "homepage": "https://github.com/Kriss1023/pagina-web-letras-y-aromas#readme",
   "dependencies": {
-    "dotenv": "^18.0.10",
-    "mongoose": "^9.12.0",
-    "express": "^5.3.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "vite": "^5.4.1"
   }
 }
