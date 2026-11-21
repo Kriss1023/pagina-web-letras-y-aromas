@@ -4,14 +4,14 @@ Tienda virtual de libros y velas artesanales construida con **React + Vite**.
 
 ## Descripción
 
-Una aplicación de e-commerce que permite explorar y comprar libros y velas con aromas especiales. La tienda se divide en categorías principales: libros y velas, con funcionalidades de filtrado y carrito de compras.
+Una página web que permite explorar y comprar libros y velas con aromas especiales. La tienda se divide en categorías principales: libros y velas, con funcionalidades de filtrado y carrito de compras.
 
 ## Características
 
 - **Catálogo interactivo** de libros y velas con filtrado por tipo
 - **Carrito de compras** con gestión de estado local
 - **Navegación intuitiva** con React Router
-- **Diseño responsive** con componentes UI cuidadosamente estilizados
+- **Diseño responsive** con componentes UI  estilizados
 - **Animaciones y efectos** visuales atractivos
 
 ## Estructura de Páginas
